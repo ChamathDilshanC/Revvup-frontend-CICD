@@ -1,13 +1,14 @@
 import React from 'react';
 import { View, Text, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import type { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
 import { PrimaryButton } from '../components/PrimaryButton';
+import type { RootTabParamList } from '../navigation/RootTabs';
 
-interface DetailsScreenProps {
-  bikeId?: string;
-}
+type DetailsScreenProps = BottomTabScreenProps<RootTabParamList, 'Details'>;
 
-export function DetailsScreen({ bikeId }: DetailsScreenProps) {
+export function DetailsScreen({ route }: DetailsScreenProps) {
+  const bikeId = route.params?.bikeId;
   return (
     <SafeAreaView className="flex-1 bg-[#0A0A0B]">
       <ScrollView className="flex-1 px-4">

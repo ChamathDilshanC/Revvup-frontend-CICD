@@ -24,7 +24,8 @@ export function CatalogScreen() {
       <FlatList
         data={PLACEHOLDER_BIKES}
         keyExtractor={(item) => item.id}
-        contentContainerClassName="px-4 pb-8 pt-4"
+        className="flex-1"
+        contentContainerStyle={{ paddingHorizontal: 16, paddingTop: 16, paddingBottom: 32 }}
         renderItem={({ item }) => <BikeCard {...item} />}
       />
     </SafeAreaView>

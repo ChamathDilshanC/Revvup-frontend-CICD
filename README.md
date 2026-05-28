@@ -38,26 +38,46 @@ revvup-frontend/
 ## Prerequisites
 
 - [Node.js](https://nodejs.org/) 18+ (LTS recommended)
-- [npm](https://www.npmjs.com/) or [yarn](https://yarnpkg.com/)
-- [Expo Go](https://expo.dev/go) on a physical device, or Android Studio / Xcode for emulators
+- [npm](https://www.npmjs.com/)
+- **[Expo Go](https://expo.dev/go)** on your phone (iOS / Android) — same Wi‑Fi as your PC
 
-## Setup
+## Setup (first time)
 
-```bash
-# From revvup-frontend/
+```powershell
+cd revvup-frontend
 npm install
-
-# Configure API base URL (create .env.local)
-# EXPO_PUBLIC_API_URL=https://your-revvup-backend.vercel.app
+copy .env.example .env
 ```
 
-## Run
+## Run with Expo Go
 
-```bash
-npm start          # Expo dev server (QR code)
-npm run android    # Android emulator / device
-npm run ios        # iOS simulator / device (macOS only)
+```powershell
+npm start
+```
+
+1. QR code එක terminal එකේ හෝ browser එකේ පෙන්වයි.
+2. Phone එකේ **Expo Go** app එක open කරන්න.
+3. **Android:** QR scan කරන්න. **iOS:** Camera app එකෙන් QR scan කරන්න.
+4. PC සහ phone **එකම Wi‑Fi** network එකේ තිබිය යුතුයි.
+
+Tunnel mode (Wi‑Fi issues):
+
+```powershell
+npx expo start --tunnel
+```
+
+## Other commands
+
+```powershell
+npm run android    # Android emulator
+npm run ios        # iOS simulator (macOS only)
 npm run web        # Web preview
+```
+
+Windows shortcut:
+
+```powershell
+.\scripts\start.ps1
 ```
 
 ## NativeWind
