@@ -104,10 +104,10 @@ Point `EXPO_PUBLIC_API_URL` at your deployed Vercel backend.
 
 ## Submodule Note
 
-This repository is a **Git submodule** of [revvup-app](https://github.com/tharakawijayathilaka/revvup-app). Clone the monorepo with:
+This repository is a **Git submodule** of [main-application](https://github.com/ChamathDilshanC/main-application). Clone the monorepo with:
 
 ```bash
-git clone --recursive https://github.com/tharakawijayathilaka/revvup-app.git
+git clone --recursive https://github.com/ChamathDilshanC/main-application.git
 ```
 
 ## License
