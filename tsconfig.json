@@ -3,14 +3,19 @@
   "compilerOptions": {
     "strict": true,
     "skipLibCheck": true,
-    "types": ["nativewind/types"]
+    "types": [
+      "nativewind/types"
+    ]
   },
   "include": [
     "**/*.ts",
     "**/*.tsx",
-    ".expo/types/**/*.ts",
-    "expo-env.d.ts",
     "nativewind-env.d.ts"
   ],
-  "exclude": ["node_modules", "babel.config.js", "metro.config.js", "tailwind.config.js"]
+  "exclude": [
+    "node_modules",
+    "babel.config.js",
+    "metro.config.js",
+    "tailwind.config.js"
+  ]
 }
