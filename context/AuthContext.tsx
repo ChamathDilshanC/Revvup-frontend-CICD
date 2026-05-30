@@ -1,4 +1,4 @@
-import React, { createContext, useCallback, useContext, useMemo, useState } from 'react';
+import React, { createContext, useCallback, useContext, useMemo, useRef, useState } from 'react';
 import {
   clearStoredProfile,
   clearTokens,
@@ -16,12 +16,19 @@ type AuthContextValue = {
   loadProfile: () => Promise<void>;
   setProfile: (profile: Profile | null) => void;
   signOut: () => Promise<void>;
+  /** Register a callback after sign-out (e.g. return to login). Not stored in navigation state. */
+  setSignOutListener: (listener: (() => void) | null) => void;
 };
 
 const AuthContext = createContext<AuthContextValue | null>(null);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [profile, setProfileState] = useState<Profile | null>(null);
+  const signOutListenerRef = useRef<(() => void) | null>(null);
+
+  const setSignOutListener = useCallback((listener: (() => void) | null) => {
+    signOutListenerRef.current = listener;
+  }, []);
 
   const setProfile = useCallback((p: Profile | null) => {
     setProfileState(p);
@@ -59,6 +66,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     await clearTokens();
     await clearStoredProfile();
     setProfileState(null);
+    signOutListenerRef.current?.();
   }, []);
 
   const value = useMemo<AuthContextValue>(
@@ -71,8 +79,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       loadProfile,
       setProfile,
       signOut,
+      setSignOutListener,
     }),
-    [profile, loadProfile, setProfile, signOut],
+    [profile, loadProfile, setProfile, signOut, setSignOutListener],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

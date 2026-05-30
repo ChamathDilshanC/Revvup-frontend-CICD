@@ -2,26 +2,51 @@ import './global.css';
 import React, { useCallback, useEffect, useState } from 'react';
 import { StatusBar } from 'expo-status-bar';
 import * as SplashScreen from 'expo-splash-screen';
-import { NavigationContainer, DarkTheme } from '@react-navigation/native';
+import { NavigationContainer, DarkTheme, DefaultTheme, type Theme } from '@react-navigation/native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { AppSplash } from './components/AppSplash';
 import { preloadAuthAssets } from './lib/preloadAssets';
 import { AuthProvider } from './context/AuthContext';
+import { ThemeProvider, useTheme } from './context/ThemeContext';
 import { RootNavigator } from './navigation/RootNavigator';
 
 SplashScreen.preventAutoHideAsync();
 
-const revvupTheme = {
-  ...DarkTheme,
-  colors: {
-    ...DarkTheme.colors,
-    primary: '#E63946',
-    background: '#0A0A0B',
-    card: '#141416',
-    text: '#F5F5F7',
-    border: '#2A2A2E',
-  },
-};
+function buildNavTheme(isDark: boolean): Theme {
+  const base = isDark ? DarkTheme : DefaultTheme;
+  return {
+    ...base,
+    colors: {
+      ...base.colors,
+      primary: '#E63946',
+      background: isDark ? '#0A0A0B' : '#F2F2F7',
+      card: isDark ? '#141416' : '#FFFFFF',
+      text: isDark ? '#F5F5F7' : '#111827',
+      border: isDark ? '#2A2A2E' : '#E5E7EB',
+    },
+  };
+}
+
+function AppNavigation() {
+  const { isDark, ready } = useTheme();
+  const navTheme = buildNavTheme(isDark);
+
+  if (!ready) {
+    return (
+      <>
+        <StatusBar style="light" />
+        <AppSplash />
+      </>
+    );
+  }
+
+  return (
+    <NavigationContainer theme={navTheme}>
+      <StatusBar style={isDark ? 'light' : 'dark'} />
+      <RootNavigator />
+    </NavigationContainer>
+  );
+}
 
 export default function App() {
   const [appReady, setAppReady] = useState(false);
@@ -52,12 +77,11 @@ export default function App() {
 
   return (
     <SafeAreaProvider onLayout={onLayoutRootView}>
-      <AuthProvider>
-        <NavigationContainer theme={revvupTheme}>
-          <StatusBar style="light" />
-          <RootNavigator />
-        </NavigationContainer>
-      </AuthProvider>
+      <ThemeProvider>
+        <AuthProvider>
+          <AppNavigation />
+        </AuthProvider>
+      </ThemeProvider>
     </SafeAreaProvider>
   );
 }

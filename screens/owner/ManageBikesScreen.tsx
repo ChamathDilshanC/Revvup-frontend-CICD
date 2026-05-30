@@ -16,6 +16,7 @@ import { BikeCard } from '../../components/BikeCard';
 import { useAuth } from '../../context/AuthContext';
 import { bikeImageUrl } from '../../lib/bikes';
 import type { ManageStackParamList } from '../../navigation/ManageStack';
+import { useTheme } from '../../context/ThemeContext';
 import { deleteBike, fetchMyBikes } from '../../services/bikes';
 import type { BikeSummary } from '../../types/bike';
 
@@ -24,6 +25,7 @@ type Nav = NativeStackNavigationProp<ManageStackParamList, 'ManageList'>;
 export function ManageBikesScreen() {
   const navigation = useNavigation<Nav>();
   const { profile } = useAuth();
+  const { classes } = useTheme();
   const [bikes, setBikes] = useState<BikeSummary[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -67,11 +69,11 @@ export function ManageBikesScreen() {
   }
 
   return (
-    <SafeAreaView className="flex-1 bg-[#0A0A0B]">
+    <SafeAreaView className={classes.screen}>
       <View className="flex-row items-center justify-between px-4 pb-2 pt-2">
         <View className="flex-1 pr-3">
-          <Text className="text-3xl font-bold text-white">My showroom</Text>
-          <Text className="mt-1 text-gray-400">
+          <Text className={classes.title}>My showroom</Text>
+          <Text className={classes.subtitle}>
             {profile?.showroom_name ?? 'Your listings'} — add, edit, or remove bikes.
           </Text>
         </View>
@@ -97,7 +99,7 @@ export function ManageBikesScreen() {
           contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 32, flexGrow: 1 }}
           ListEmptyComponent={
             <View className="mt-12 items-center px-4">
-              <Text className="text-center text-gray-400">No bikes yet. Tap + to add your first listing.</Text>
+              <Text className={classes.bodyCenter}>No bikes yet. Tap + to add your first listing.</Text>
               <Pressable
                 onPress={() => navigation.navigate('BikeForm', {})}
                 className="mt-6 rounded-xl bg-[#E63946] px-6 py-3"

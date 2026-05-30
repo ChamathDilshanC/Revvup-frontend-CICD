@@ -6,7 +6,10 @@ const KEYS = {
   refreshToken: '@revvup/refresh_token',
   pendingOwnerEmail: '@revvup/pending_owner_email',
   profile: '@revvup/profile',
+  themePreference: '@revvup/theme_preference',
 } as const;
+
+export type StoredThemePreference = 'dark' | 'light';
 
 export async function getHasSeenWelcome(): Promise<boolean> {
   const v = await AsyncStorage.getItem(KEYS.hasSeenWelcome);
@@ -54,4 +57,13 @@ export async function setStoredProfile(json: string): Promise<void> {
 
 export async function clearStoredProfile(): Promise<void> {
   await AsyncStorage.removeItem(KEYS.profile);
+}
+
+export async function getThemePreference(): Promise<StoredThemePreference | null> {
+  const v = await AsyncStorage.getItem(KEYS.themePreference);
+  return v === 'light' || v === 'dark' ? v : null;
+}
+
+export async function setThemePreference(value: StoredThemePreference): Promise<void> {
+  await AsyncStorage.setItem(KEYS.themePreference, value);
 }

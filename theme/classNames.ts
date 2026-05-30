@@ -1,0 +1,48 @@
+/** Semantic Tailwind classes — light default, `dark:` when colorScheme is dark. */
+export const c = {
+  screen: 'flex-1 bg-[#F2F2F7] dark:bg-[#0A0A0B]',
+  title: 'text-3xl font-bold text-gray-900 dark:text-white',
+  titleLg: 'text-2xl font-bold text-gray-900 dark:text-white',
+  titleXl: 'mt-1 text-3xl font-bold text-gray-900 dark:text-white',
+  subtitle: 'mt-1 text-gray-600 dark:text-gray-400',
+  subtitleMt2: 'mt-2 text-gray-600 dark:text-gray-400',
+  body: 'text-gray-600 dark:text-gray-400',
+  bodyCenter: 'text-center text-gray-600 dark:text-gray-400',
+  bodySm: 'text-sm text-gray-600 dark:text-gray-500',
+  bodyXs: 'text-xs text-gray-500 dark:text-gray-500',
+  bodyXsMuted: 'text-xs text-gray-500 dark:text-gray-600',
+  heading: 'text-lg font-bold text-gray-900 dark:text-white',
+  headingSemibold: 'text-lg font-semibold text-gray-900 dark:text-white',
+  text: 'text-base text-gray-900 dark:text-white',
+  textBold: 'font-medium text-gray-900 dark:text-white',
+  textBoldLg: 'text-lg font-semibold text-gray-900 dark:text-white',
+  back: 'text-base text-gray-900 dark:text-white',
+  card: 'rounded-2xl border border-gray-200 bg-white dark:border-[#2A2A2E] dark:bg-[#141416]',
+  cardPadded: 'rounded-2xl border border-gray-200 bg-white p-5 dark:border-[#2A2A2E] dark:bg-[#141416]',
+  sectionHeader:
+    'mb-3 mt-5 rounded-xl border border-gray-200 bg-white px-4 py-3 active:opacity-90 dark:border-[#2A2A2E] dark:bg-[#141416]',
+  row: 'mb-4 border-b border-gray-200 pb-4 dark:border-[#2A2A2E] last:mb-0 last:border-0 last:pb-0',
+  rowLabel: 'text-xs uppercase tracking-wide text-gray-500',
+  rowValue: 'mt-1 text-base font-medium text-gray-900 dark:text-white',
+  inputLabel: 'mb-1 text-sm text-gray-600 dark:text-gray-400',
+  input:
+    'rounded-xl border border-gray-300 bg-white px-4 py-3 text-base text-gray-900 dark:border-[#2A2A2E] dark:bg-[#141416] dark:text-white',
+  inputMb:
+    'mb-3 rounded-xl border border-gray-300 bg-white px-4 py-3 text-base text-gray-900 dark:border-[#2A2A2E] dark:bg-[#141416] dark:text-white',
+  specRow: 'flex-row justify-between border-b border-gray-200 py-3 dark:border-[#2A2A2E] last:border-0',
+  specLabel: 'text-gray-600 dark:text-gray-400',
+  specValue: 'font-medium text-gray-900 dark:text-white',
+  sectionLabel: 'mb-2 text-sm font-semibold text-gray-600 dark:text-gray-400',
+  sectionLabelMb3: 'mb-3 text-sm font-semibold uppercase tracking-wide text-gray-600 dark:text-gray-400',
+  brand: 'text-xs uppercase tracking-widest text-gray-500 dark:text-gray-400',
+  empty: 'mt-8 text-center text-gray-500',
+  bikeCard:
+    'mb-4 overflow-hidden rounded-2xl border border-gray-200 bg-white dark:border-[#2A2A2E] dark:bg-[#141416]',
+  bikeName: 'mt-1 text-lg font-semibold text-gray-900 dark:text-white',
+  photoPicker:
+    'overflow-hidden rounded-2xl border border-dashed border-gray-300 bg-gray-50 dark:border-[#3A3A40] dark:bg-[#141416]',
+  photoPickerInner: 'h-14 w-14 items-center justify-center rounded-full bg-gray-200 dark:bg-[#1E1E22]',
+  photoChip: 'flex-1 flex-row items-center justify-center gap-1.5 rounded-xl border border-gray-200 bg-white px-3 py-2.5 dark:border-[#2A2A2E] dark:bg-[#141416]',
+  photoChipText: 'text-sm font-medium text-gray-700 dark:text-gray-200',
+  manageActions: 'mt-2 flex-row gap-2 border-t border-gray-100 pt-3 dark:border-[#2A2A2E]',
+} as const;

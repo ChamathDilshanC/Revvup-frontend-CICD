@@ -7,7 +7,7 @@ import { AuthStack } from './AuthStack';
 import { RootTabs } from './RootTabs';
 
 export function RootNavigator() {
-  const { loadProfile } = useAuth();
+  const { loadProfile, setSignOutListener } = useAuth();
   const [booting, setBooting] = useState(true);
   const [seenWelcome, setSeenWelcome] = useState(false);
   const [isAuthed, setIsAuthed] = useState(false);
@@ -39,6 +39,11 @@ export function RootNavigator() {
     setIsAuthed(false);
   }, []);
 
+  useEffect(() => {
+    setSignOutListener(handleSignedOut);
+    return () => setSignOutListener(null);
+  }, [handleSignedOut, setSignOutListener]);
+
   if (booting) {
     return <AppSplash />;
   }
@@ -51,5 +56,5 @@ export function RootNavigator() {
     return <AuthStack onAuthenticated={handleAuthenticated} />;
   }
 
-  return <RootTabs onSignedOut={handleSignedOut} />;
+  return <RootTabs />;
 }

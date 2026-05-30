@@ -2,9 +2,10 @@ import { Ionicons } from '@expo/vector-icons';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import React from 'react';
 import { useAuth } from '../context/AuthContext';
+import { useTheme } from '../context/ThemeContext';
 import { ExploreStack } from './ExploreStack';
 import { ManageStack } from './ManageStack';
-import { ProfileScreen } from '../screens/ProfileScreen';
+import { ProfileStack } from './ProfileStack';
 
 export type RootTabParamList = {
   Explore: undefined;
@@ -14,23 +15,20 @@ export type RootTabParamList = {
 
 const Tab = createBottomTabNavigator<RootTabParamList>();
 
-type RootTabsProps = {
-  onSignedOut?: () => void;
-};
-
-export function RootTabs({ onSignedOut }: RootTabsProps) {
+export function RootTabs() {
   const { isOwner } = useAuth();
+  const { colors } = useTheme();
 
   return (
     <Tab.Navigator
       screenOptions={{
         headerShown: false,
         tabBarStyle: {
-          backgroundColor: '#141416',
-          borderTopColor: '#2A2A2E',
+          backgroundColor: colors.tabBar,
+          borderTopColor: colors.tabBarBorder,
         },
-        tabBarActiveTintColor: '#E63946',
-        tabBarInactiveTintColor: '#6B7280',
+        tabBarActiveTintColor: colors.primary,
+        tabBarInactiveTintColor: colors.tabInactive,
       }}
     >
       {isOwner ? (
@@ -54,12 +52,11 @@ export function RootTabs({ onSignedOut }: RootTabsProps) {
       />
       <Tab.Screen
         name="Profile"
+        component={ProfileStack}
         options={{
           tabBarIcon: ({ color, size }) => <Ionicons name="person-outline" size={size} color={color} />,
         }}
-      >
-        {() => <ProfileScreen onSignedOut={onSignedOut} />}
-      </Tab.Screen>
+      />
     </Tab.Navigator>
   );
 }

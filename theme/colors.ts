@@ -1,17 +1,17 @@
-/**
- * RevvUp design tokens — premium dark motor theme
- */
+import { darkColors } from './tokens';
+
+/** @deprecated Prefer useTheme().colors — kept for components that only need primary. */
 export const colors = {
-  background: '#0A0A0B',
-  surface: '#141416',
-  surfaceElevated: '#1C1C1F',
-  border: '#2A2A2E',
-  primary: '#E63946',
+  background: darkColors.background,
+  surface: darkColors.surface,
+  surfaceElevated: darkColors.surfaceElevated,
+  border: darkColors.border,
+  primary: darkColors.primary,
   primaryMuted: '#B82D38',
   accent: '#F4A261',
-  text: '#F5F5F7',
-  textSecondary: '#9CA3AF',
-  textMuted: '#6B7280',
+  text: darkColors.text,
+  textSecondary: darkColors.textSecondary,
+  textMuted: darkColors.textMuted,
   success: '#22C55E',
   warning: '#EAB308',
 } as const;

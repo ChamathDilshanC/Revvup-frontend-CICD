@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, Pressable } from 'react-native';
+import { useTheme } from '../context/ThemeContext';
 import { AppImage } from './AppImage';
-import { colors } from '../theme/colors';
 
 export interface BikeCardProps {
   id: string;
@@ -14,22 +14,19 @@ export interface BikeCardProps {
 }
 
 export function BikeCard({ id, name, brand, price, imageUrl, topSpeed, onPress }: BikeCardProps) {
+  const { classes, colors } = useTheme();
+
   return (
-    <Pressable
-      onPress={() => onPress?.(id)}
-      className="mb-4 overflow-hidden rounded-2xl bg-[#141416] border border-[#2A2A2E]"
-    >
+    <Pressable onPress={() => onPress?.(id)} className={classes.bikeCard}>
       <AppImage source={{ uri: imageUrl }} className="h-44 w-full" resizeMode="cover" />
       <View className="p-4">
-        <Text className="text-xs uppercase tracking-widest text-gray-400">{brand}</Text>
-        <Text className="mt-1 text-lg font-semibold text-white">{name}</Text>
+        <Text className={classes.brand}>{brand}</Text>
+        <Text className={classes.bikeName}>{name}</Text>
         <View className="mt-3 flex-row items-center justify-between">
           <Text style={{ color: colors.primary }} className="text-base font-bold">
             ${price.toLocaleString()}
           </Text>
-          {topSpeed != null && (
-            <Text className="text-sm text-gray-400">{topSpeed} mph</Text>
-          )}
+          {topSpeed != null && <Text className={classes.bodySm}>{topSpeed} mph</Text>}
         </View>
       </View>
     </Pressable>

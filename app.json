@@ -5,7 +5,7 @@
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/AppLogo.png",
-    "userInterfaceStyle": "dark",
+    "userInterfaceStyle": "automatic",
     "scheme": "revvup",
     "splash": {
       "image": "./assets/AppLogo.png",
@@ -14,7 +14,10 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.revvup.app"
+      "bundleIdentifier": "com.revvup.app",
+      "infoPlist": {
+        "LSApplicationQueriesSchemes": ["app-settings", "App-Prefs", "prefs"]
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -28,6 +31,14 @@
       "bundler": "metro"
     },
     "plugins": [
+      "expo-location",
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Allow RevvUp to access your photos to add bike listing images.",
+          "cameraPermission": "Allow RevvUp to use your camera to photograph bikes for listings."
+        }
+      ],
       "expo-asset",
       "expo-font",
       [

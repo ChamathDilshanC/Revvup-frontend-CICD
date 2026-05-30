@@ -3,15 +3,19 @@ import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import React, { useCallback, useState } from 'react';
 import {
   ActivityIndicator,
+  Pressable,
   RefreshControl,
   SectionList,
   Text,
   View,
 } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+import { hasMapCoordinates } from '../constants/map';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { BikeCard } from '../components/BikeCard';
 import { bikeImageUrl, groupBikesByShowroom } from '../lib/bikes';
 import type { ExploreStackParamList } from '../navigation/ExploreStack';
+import { useTheme } from '../context/ThemeContext';
 import { fetchCatalog } from '../services/bikes';
 import type { BikeSummary } from '../types/bike';
 
@@ -19,6 +23,7 @@ type Nav = NativeStackNavigationProp<ExploreStackParamList, 'ExploreHome'>;
 
 export function ExploreScreen() {
   const navigation = useNavigation<Nav>();
+  const { classes } = useTheme();
   const [bikes, setBikes] = useState<BikeSummary[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -48,14 +53,16 @@ export function ExploreScreen() {
   const sections = groupBikesByShowroom(bikes).map((g) => ({
     title: g.showroomName,
     address: g.showroomAddress,
+    latitude: g.showroomLatitude,
+    longitude: g.showroomLongitude,
     data: g.bikes,
   }));
 
   return (
-    <SafeAreaView className="flex-1 bg-[#0A0A0B]">
+    <SafeAreaView className={classes.screen}>
       <View className="px-4 pb-3 pt-2">
-        <Text className="text-3xl font-bold text-white">Explore</Text>
-        <Text className="mt-1 text-gray-400">
+        <Text className={classes.title}>Explore</Text>
+        <Text className={classes.subtitle}>
           Browse premium bikes from every verified showroom.
         </Text>
       </View>
@@ -66,7 +73,7 @@ export function ExploreScreen() {
         </View>
       ) : error ? (
         <View className="flex-1 items-center justify-center px-6">
-          <Text className="text-center text-gray-400">{error}</Text>
+          <Text className={classes.bodyCenter}>{error}</Text>
         </View>
       ) : (
         <SectionList
@@ -76,19 +83,44 @@ export function ExploreScreen() {
           contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 32 }}
           stickySectionHeadersEnabled={false}
           ListEmptyComponent={
-            <Text className="mt-8 text-center text-gray-500">No bikes listed yet. Check back soon.</Text>
+            <Text className={classes.empty}>No bikes listed yet. Check back soon.</Text>
           }
-          renderSectionHeader={({ section }) => (
-            <View className="mb-3 mt-5 rounded-xl border border-[#2A2A2E] bg-[#141416] px-4 py-3">
-              <Text className="text-lg font-bold text-white">{section.title}</Text>
-              {section.address ? (
-                <Text className="mt-1 text-sm text-gray-400">{section.address}</Text>
-              ) : null}
-              <Text className="mt-1 text-xs text-gray-500">
-                {section.data.length} bike{section.data.length === 1 ? '' : 's'}
-              </Text>
-            </View>
-          )}
+          renderSectionHeader={({ section }) => {
+            const canMap = hasMapCoordinates(section.latitude, section.longitude);
+            return (
+              <Pressable
+                disabled={!canMap}
+                onPress={() =>
+                  canMap &&
+                  navigation.navigate('ShowroomMap', {
+                    showroomName: section.title,
+                    showroomAddress: section.address,
+                    latitude: section.latitude!,
+                    longitude: section.longitude!,
+                  })
+                }
+                className={classes.sectionHeader}
+              >
+                <View className="flex-row items-start justify-between">
+                  <View className="flex-1 pr-2">
+                    <Text className={classes.heading}>{section.title}</Text>
+                    {section.address ? (
+                      <Text className={`${classes.bodySm} mt-1`}>{section.address}</Text>
+                    ) : null}
+                    <Text className={`${classes.bodyXs} mt-1`}>
+                      {section.data.length} bike{section.data.length === 1 ? '' : 's'}
+                    </Text>
+                  </View>
+                  {canMap ? (
+                    <View className="flex-row items-center gap-1 pt-1">
+                      <Ionicons name="map-outline" size={18} color="#E63946" />
+                      <Text className="text-xs font-semibold text-[#E63946]">Map</Text>
+                    </View>
+                  ) : null}
+                </View>
+              </Pressable>
+            );
+          }}
           renderItem={({ item }) => (
             <BikeCard
               id={item.id}
