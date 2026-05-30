@@ -10,6 +10,8 @@ export type Profile = {
   showroom_name: string | null;
   showroom_address: string | null;
   phone: string | null;
+  latitude: number | null;
+  longitude: number | null;
 };
 
 export type AuthResponse = {

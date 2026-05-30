@@ -11,9 +11,20 @@ export function groupBikesByShowroom(bikes: BikeSummary[]): {
   key: string;
   showroomName: string;
   showroomAddress: string | null;
+  showroomLatitude: number | null;
+  showroomLongitude: number | null;
   bikes: BikeSummary[];
 }[] {
-  const map = new Map<string, { showroomName: string; showroomAddress: string | null; bikes: BikeSummary[] }>();
+  const map = new Map<
+    string,
+    {
+      showroomName: string;
+      showroomAddress: string | null;
+      showroomLatitude: number | null;
+      showroomLongitude: number | null;
+      bikes: BikeSummary[];
+    }
+  >();
 
   for (const bike of bikes) {
     const key = bike.owner_id ?? bike.showroom_name ?? 'unknown';
@@ -25,6 +36,8 @@ export function groupBikesByShowroom(bikes: BikeSummary[]): {
       map.set(key, {
         showroomName: name,
         showroomAddress: bike.showroom_address,
+        showroomLatitude: bike.showroom_latitude,
+        showroomLongitude: bike.showroom_longitude,
         bikes: [bike],
       });
     }

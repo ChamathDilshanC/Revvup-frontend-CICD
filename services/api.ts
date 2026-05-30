@@ -37,9 +37,15 @@ export async function apiRequest<T>(
 
   if (!res.ok || data?.success === false) {
     const err = data?.error as ApiError | undefined;
+    const detail =
+      typeof data?.detail === 'string'
+        ? data.detail
+        : Array.isArray(data?.detail)
+          ? String(data.detail[0]?.msg ?? data.detail[0])
+          : undefined;
     throw new ApiRequestError(
       err?.code ?? 'REQUEST_FAILED',
-      err?.message ?? data?.message ?? 'Request failed',
+      err?.message ?? detail ?? data?.message ?? 'Request failed',
     );
   }
 

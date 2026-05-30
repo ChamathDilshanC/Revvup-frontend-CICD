@@ -8,6 +8,8 @@ export type BikeSummary = {
   owner_id: string | null;
   showroom_name: string | null;
   showroom_address: string | null;
+  showroom_latitude: number | null;
+  showroom_longitude: number | null;
 };
 
 export type BikeDetail = BikeSummary & {
