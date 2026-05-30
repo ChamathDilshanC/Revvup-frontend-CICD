@@ -5,16 +5,25 @@ interface PrimaryButtonProps {
   label: string;
   onPress?: () => void;
   loading?: boolean;
+  disabled?: boolean;
   variant?: 'primary' | 'outline';
 }
 
-export function PrimaryButton({ label, onPress, loading, variant = 'primary' }: PrimaryButtonProps) {
+export function PrimaryButton({
+  label,
+  onPress,
+  loading,
+  disabled = false,
+  variant = 'primary',
+}: PrimaryButtonProps) {
   const isOutline = variant === 'outline';
+  const isDisabled = loading || disabled;
   return (
     <Pressable
       onPress={onPress}
-      disabled={loading}
+      disabled={isDisabled}
       className={`rounded-xl px-6 py-4 ${isOutline ? 'border border-[#E63946] bg-transparent' : 'bg-[#E63946]'}`}
+      style={isDisabled ? { opacity: 0.45 } : undefined}
     >
       {loading ? (
         <ActivityIndicator color={isOutline ? '#E63946' : '#fff'} />
