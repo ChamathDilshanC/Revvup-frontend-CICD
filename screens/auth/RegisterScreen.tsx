@@ -10,15 +10,21 @@ import {
   TextInput,
   View,
 } from 'react-native';
-import { AuthBackButton } from '../components/AuthBackButton';
-import { AuthBrandHeader } from '../components/AuthBrandHeader';
-import { AuthScaffold } from '../components/AuthScaffold';
-import { AuthTextField } from '../components/AuthTextField';
-import { PendingOwnerBanner } from '../components/PendingOwnerBanner';
-import { PrimaryButton } from '../components/PrimaryButton';
-import type { AuthStackParamList } from '../navigation/AuthStack';
-import { ApiRequestError, apiRequest } from '../services/api';
-import { getPendingOwnerEmail, setPendingOwnerEmail, setTokens } from '../lib/storage';
+import { AuthBackButton } from '../../components/AuthBackButton';
+import { AuthBrandHeader } from '../../components/AuthBrandHeader';
+import { AuthScaffold } from '../../components/AuthScaffold';
+import { AuthTextField } from '../../components/AuthTextField';
+import { PendingOwnerBanner } from '../../components/PendingOwnerBanner';
+import { PrimaryButton } from '../../components/PrimaryButton';
+import type { AuthStackParamList } from '../../navigation/AuthStack';
+import { ApiRequestError, apiRequest } from '../../services/api';
+import {
+  getPendingOwnerEmail,
+  setPendingOwnerEmail,
+  setTokens,
+  setUserRole,
+  type UserRole,
+} from '../../lib/storage';
 
 type Props = NativeStackScreenProps<AuthStackParamList, 'Register'> & {
   onAuthenticated: () => void;
@@ -146,6 +152,8 @@ export function RegisterScreen({ navigation, onAuthenticated }: Props) {
 
       if (data.access_token) {
         await setTokens(data.access_token, data.refresh_token);
+        const r = (data.profile?.role as UserRole) || 'client';
+        await setUserRole(r);
         onAuthenticated();
         return;
       }

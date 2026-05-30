@@ -1,115 +1,75 @@
 # RevvUp Frontend
 
-Premium motorbike marketplace mobile client built with **React Native**, **Expo**, and **NativeWind** (Tailwind CSS for React Native).
+React Native (Expo) mobile app for **RevvUp** — premium dark UI, NativeWind (Tailwind), and **role-based navigation** for clients vs showroom owners.
 
-## Features
+## Dual experience
 
-- **Modern dark UI** — High-contrast surfaces (`#0A0A0B`), accent red (`#E63946`), and refined typography for a luxury catalog feel.
-- **Screen modules** — `Explore`, `Catalog`, `Details`, and `Profile` under `screens/`.
-- **Reusable components** — `BikeCard`, `PrimaryButton`, and theme tokens in `theme/colors.ts`.
-- **API-ready** — Designed to consume the RevvUp FastAPI backend (`GET /api/v1/bikes`, bike details, auth).
+| Role | Screens | Tabs |
+| ---- | ------- | ---- |
+| **Client** | Explore, Catalog, Details, Profile | `RootTabs` |
+| **Showroom owner** | Dashboard, Inventory, Add bike, Profile | `OwnerTabs` |
 
-## Tech Stack
+Auth flow supports **role selection** at register (`client` | `showroom_owner`). JWT + role stored in AsyncStorage drive which tab navigator loads after login.
 
-| Layer        | Technology                          |
-| ------------ | ----------------------------------- |
-| Framework    | React Native (Expo)                 |
-| Styling      | NativeWind v4 + Tailwind CSS 3      |
-| Language     | TypeScript                          |
-| Navigation   | Expo Router / React Navigation (TBD)|
-
-## Project Structure
+## Folder structure
 
 ```
 revvup-frontend/
-├── App.tsx              # Root entry
-├── components/          # BikeCard, PrimaryButton, …
+├── App.tsx
+├── components/          # BikeCard, BikeSlider, Auth*, PrimaryButton
 ├── screens/
-│   ├── ExploreScreen.tsx
-│   ├── CatalogScreen.tsx
-│   ├── DetailsScreen.tsx
-│   └── ProfileScreen.tsx
-├── theme/
-│   └── colors.ts        # Design tokens
-├── package.json
-└── tailwind.config.js
-```
-
-## Prerequisites
-
-- [Node.js](https://nodejs.org/) 18+ (LTS recommended)
-- [npm](https://www.npmjs.com/)
-- **[Expo Go](https://expo.dev/go)** on your phone (iOS / Android) — same Wi‑Fi as your PC
-
-## Setup (first time)
-
-```powershell
-cd revvup-frontend
-npm install
-copy .env.example .env
-```
-
-## Run with Expo Go
-
-```powershell
-npm start
-```
-
-1. QR code එක terminal එකේ හෝ browser එකේ පෙන්වයි.
-2. Phone එකේ **Expo Go** app එක open කරන්න.
-3. **Android:** QR scan කරන්න. **iOS:** Camera app එකෙන් QR scan කරන්න.
-4. PC සහ phone **එකම Wi‑Fi** network එකේ තිබිය යුතුයි.
-
-Tunnel mode (Wi‑Fi issues):
-
-```powershell
-npx expo start --tunnel
-```
-
-## Other commands
-
-```powershell
-npm run android    # Android emulator
-npm run ios        # iOS simulator (macOS only)
-npm run web        # Web preview
-```
-
-Windows shortcut:
-
-```powershell
-.\scripts\start.ps1
+│   ├── auth/            # LoginScreen, RegisterScreen
+│   ├── client/          # Welcome, Explore, Catalog, Details, Profile
+│   └── owner/           # Dashboard, ManageInventory, AddEditBike
+├── navigation/          # RootNavigator, AuthStack, RootTabs, OwnerTabs
+├── theme/colors.ts      # Design tokens (#0A0A0B, #E63946, …)
+├── lib/storage.ts       # Tokens, role, welcome flag
+├── services/api.ts      # API client
+└── config/api.ts
 ```
 
 ## NativeWind
 
-NativeWind maps Tailwind utility classes to React Native styles. Ensure `tailwind.config.js` content paths include your components and screens. Use `className` on supported primitives (`View`, `Text`, `Pressable`, etc.).
+- `global.css` + `tailwind.config.js` + `babel.config.js` (`nativewind/babel`)
+- Use `className` on `View` / `Text` (dark backgrounds, red primary CTA)
 
-Example:
+## Navigation flow
 
-```tsx
-<View className="flex-1 bg-[#0A0A0B] px-4">
-  <Text className="text-3xl font-bold text-white">Catalog</Text>
-</View>
+```mermaid
+flowchart TD
+  A[App launch] --> B{Seen welcome?}
+  B -->|No| W[WelcomeScreen]
+  B -->|Yes| C{JWT?}
+  C -->|No| L[AuthStack Login/Register]
+  C -->|Yes| R{Role?}
+  R -->|client| T[RootTabs Explore/Catalog]
+  R -->|showroom_owner| O[OwnerTabs Dashboard/Inventory]
 ```
 
-## Backend Integration
+## Environment
 
-| Screen    | Endpoint                         |
-| --------- | -------------------------------- |
-| Catalog   | `GET /api/v1/bikes`              |
-| Details   | `GET /api/v1/bikes/{id}`         |
-| Profile   | `POST /api/v1/auth/login`, `register` |
+```env
+EXPO_PUBLIC_API_URL=https://revvup-backend.vercel.app
+```
 
-Point `EXPO_PUBLIC_API_URL` at your deployed Vercel backend.
-
-## Submodule Note
-
-This repository is a **Git submodule** of [main-application](https://github.com/ChamathDilshanC/main-application). Clone the monorepo with:
+## Run
 
 ```bash
-git clone --recursive https://github.com/ChamathDilshanC/main-application.git
+npm install
+npx expo start
+# Device on another network:
+npx expo start --tunnel
 ```
 
-## License
+## API usage (by role)
 
-Proprietary — RevvUp © 2026
+| Screen | Endpoint |
+| ------ | -------- |
+| Explore / Catalog | `GET /api/v1/bikes` |
+| Details | `GET /api/v1/bikes/{id}` |
+| Owner inventory | `GET /api/v1/owner/bikes` + Bearer token |
+| Add / edit bike | `POST` / `PUT /api/v1/owner/bikes` |
+
+## Parent repo
+
+Submodule of [revvup-app](https://github.com/ChamathDilshanC/revvup-app).

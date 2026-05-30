@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, FlatList } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { BikeCard } from '../components/BikeCard';
+import { BikeCard } from '../../components/BikeCard';
 
 const PLACEHOLDER_BIKES = [
   {

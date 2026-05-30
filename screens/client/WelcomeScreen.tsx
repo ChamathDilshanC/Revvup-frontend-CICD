@@ -2,10 +2,10 @@ import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { AppImage } from '../components/AppImage';
-import { PrimaryButton } from '../components/PrimaryButton';
-import { AuthFooter } from '../components/AuthFooter';
-import { AUTH_HERO_IMAGE, APP_LOGO } from '../constants/images';
+import { AppImage } from '../../components/AppImage';
+import { PrimaryButton } from '../../components/PrimaryButton';
+import { AuthFooter } from '../../components/AuthFooter';
+import { AUTH_HERO_IMAGE, APP_LOGO } from '../../constants/images';
 
 type WelcomeScreenProps = {
   onContinue: () => void;
