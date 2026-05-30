@@ -1,21 +1,26 @@
-import React from 'react';
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Ionicons } from '@expo/vector-icons';
-import { ExploreScreen } from '../screens/client/ExploreScreen';
-import { CatalogScreen } from '../screens/client/CatalogScreen';
-import { DetailsScreen } from '../screens/client/DetailsScreen';
-import { ProfileScreen } from '../screens/client/ProfileScreen';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import React from 'react';
+import { useAuth } from '../context/AuthContext';
+import { ExploreStack } from './ExploreStack';
+import { ManageStack } from './ManageStack';
+import { ProfileScreen } from '../screens/ProfileScreen';
 
 export type RootTabParamList = {
   Explore: undefined;
-  Catalog: undefined;
-  Details: { bikeId?: string } | undefined;
+  Manage: undefined;
   Profile: undefined;
 };
 
 const Tab = createBottomTabNavigator<RootTabParamList>();
 
-export function RootTabs() {
+type RootTabsProps = {
+  onSignedOut?: () => void;
+};
+
+export function RootTabs({ onSignedOut }: RootTabsProps) {
+  const { isOwner } = useAuth();
+
   return (
     <Tab.Navigator
       screenOptions={{
@@ -28,35 +33,33 @@ export function RootTabs() {
         tabBarInactiveTintColor: '#6B7280',
       }}
     >
+      {isOwner ? (
+        <Tab.Screen
+          name="Manage"
+          component={ManageStack}
+          options={{
+            title: 'My bikes',
+            tabBarIcon: ({ color, size }) => (
+              <Ionicons name="construct-outline" size={size} color={color} />
+            ),
+          }}
+        />
+      ) : null}
       <Tab.Screen
         name="Explore"
-        component={ExploreScreen}
+        component={ExploreStack}
         options={{
           tabBarIcon: ({ color, size }) => <Ionicons name="compass-outline" size={size} color={color} />,
         }}
       />
       <Tab.Screen
-        name="Catalog"
-        component={CatalogScreen}
-        options={{
-          tabBarIcon: ({ color, size }) => <Ionicons name="bicycle-outline" size={size} color={color} />,
-        }}
-      />
-      <Tab.Screen
-        name="Details"
-        component={DetailsScreen}
-        initialParams={{ bikeId: '1' }}
-        options={{
-          tabBarIcon: ({ color, size }) => <Ionicons name="information-circle-outline" size={size} color={color} />,
-        }}
-      />
-      <Tab.Screen
         name="Profile"
-        component={ProfileScreen}
         options={{
           tabBarIcon: ({ color, size }) => <Ionicons name="person-outline" size={size} color={color} />,
         }}
-      />
+      >
+        {() => <ProfileScreen onSignedOut={onSignedOut} />}
+      </Tab.Screen>
     </Tab.Navigator>
   );
 }

@@ -5,22 +5,18 @@ import { AuthBrandHeader } from '../components/AuthBrandHeader';
 import { AuthScaffold } from '../components/AuthScaffold';
 import { AuthTextField } from '../components/AuthTextField';
 import { PrimaryButton } from '../components/PrimaryButton';
-import { clearPendingOwnerEmail, setTokens } from '../lib/storage';
 import type { AuthStackParamList } from '../navigation/AuthStack';
+import { useAuth } from '../context/AuthContext';
 import { ApiRequestError, apiRequest } from '../services/api';
+import { clearPendingOwnerEmail, setTokens } from '../lib/storage';
+import type { AuthResponse } from '../types/user';
 
 type Props = NativeStackScreenProps<AuthStackParamList, 'Login'> & {
   onAuthenticated: () => void;
 };
 
-type AuthResponse = {
-  access_token: string | null;
-  refresh_token?: string | null;
-  profile: { email: string; role: string; status: string };
-  message?: string;
-};
-
 export function LoginScreen({ navigation, onAuthenticated }: Props) {
+  const { setProfile } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -41,6 +37,7 @@ export function LoginScreen({ navigation, onAuthenticated }: Props) {
         await setTokens(data.access_token, data.refresh_token);
         await clearPendingOwnerEmail();
       }
+      setProfile(data.profile);
       onAuthenticated();
     } catch (e) {
       if (e instanceof ApiRequestError && e.code === 'ACCOUNT_PENDING') {

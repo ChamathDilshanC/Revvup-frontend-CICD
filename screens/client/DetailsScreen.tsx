@@ -1,9 +1,9 @@
-import React from 'react';
-import { View, Text, ScrollView } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import type { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
-import { PrimaryButton } from '../../components/PrimaryButton';
-import type { RootTabParamList } from '../../navigation/RootTabs';
+import React from 'react';
+import { ScrollView, Text, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { PrimaryButton } from '../components/PrimaryButton';
+import type { RootTabParamList } from '../navigation/RootTabs';
 
 type DetailsScreenProps = BottomTabScreenProps<RootTabParamList, 'Details'>;
 

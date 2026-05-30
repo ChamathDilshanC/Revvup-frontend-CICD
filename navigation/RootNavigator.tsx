@@ -1,35 +1,42 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { AppSplash } from '../components/AppSplash';
-import { getAccessToken, getHasSeenWelcome, getUserRole, setHasSeenWelcome } from '../lib/storage';
-import { WelcomeScreen } from '../screens/client/WelcomeScreen';
+import { useAuth } from '../context/AuthContext';
+import { getAccessToken, getHasSeenWelcome, setHasSeenWelcome } from '../lib/storage';
+import { WelcomeScreen } from '../screens/WelcomeScreen';
 import { AuthStack } from './AuthStack';
-import { OwnerTabs } from './OwnerTabs';
 import { RootTabs } from './RootTabs';
 
 export function RootNavigator() {
+  const { loadProfile } = useAuth();
   const [booting, setBooting] = useState(true);
   const [seenWelcome, setSeenWelcome] = useState(false);
   const [isAuthed, setIsAuthed] = useState(false);
-  const [role, setRole] = useState<'client' | 'showroom_owner' | 'admin' | null>(null);
 
   useEffect(() => {
     async function boot() {
-      const [welcome, token, storedRole] = await Promise.all([
-        getHasSeenWelcome(),
-        getAccessToken(),
-        getUserRole(),
-      ]);
+      const [welcome, token] = await Promise.all([getHasSeenWelcome(), getAccessToken()]);
       setSeenWelcome(welcome);
-      setIsAuthed(Boolean(token));
-      setRole(storedRole);
+      if (token) {
+        setIsAuthed(true);
+        await loadProfile();
+      }
       setBooting(false);
     }
-    boot();
-  }, []);
+    void boot();
+  }, [loadProfile]);
 
   const handleWelcomeContinue = useCallback(async () => {
     await setHasSeenWelcome();
     setSeenWelcome(true);
+  }, []);
+
+  const handleAuthenticated = useCallback(async () => {
+    setIsAuthed(true);
+    await loadProfile();
+  }, [loadProfile]);
+
+  const handleSignedOut = useCallback(() => {
+    setIsAuthed(false);
   }, []);
 
   if (booting) {
@@ -41,19 +48,8 @@ export function RootNavigator() {
   }
 
   if (!isAuthed) {
-    return (
-      <AuthStack
-        onAuthenticated={async () => {
-          setIsAuthed(true);
-          setRole(await getUserRole());
-        }}
-      />
-    );
+    return <AuthStack onAuthenticated={handleAuthenticated} />;
   }
 
-  if (role === 'showroom_owner' || role === 'admin') {
-    return <OwnerTabs />;
-  }
-
-  return <RootTabs />;
+  return <RootTabs onSignedOut={handleSignedOut} />;
 }

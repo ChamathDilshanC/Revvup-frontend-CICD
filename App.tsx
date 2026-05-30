@@ -6,6 +6,7 @@ import { NavigationContainer, DarkTheme } from '@react-navigation/native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { AppSplash } from './components/AppSplash';
 import { preloadAuthAssets } from './lib/preloadAssets';
+import { AuthProvider } from './context/AuthContext';
 import { RootNavigator } from './navigation/RootNavigator';
 
 SplashScreen.preventAutoHideAsync();
@@ -51,10 +52,12 @@ export default function App() {
 
   return (
     <SafeAreaProvider onLayout={onLayoutRootView}>
-      <NavigationContainer theme={revvupTheme}>
-        <StatusBar style="light" />
-        <RootNavigator />
-      </NavigationContainer>
+      <AuthProvider>
+        <NavigationContainer theme={revvupTheme}>
+          <StatusBar style="light" />
+          <RootNavigator />
+        </NavigationContainer>
+      </AuthProvider>
     </SafeAreaProvider>
   );
 }

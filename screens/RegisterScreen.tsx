@@ -1,14 +1,14 @@
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import {
-    Alert,
-    BackHandler,
-    Pressable,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TextInput,
-    View,
+  Alert,
+  BackHandler,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
 } from 'react-native';
 import { AuthBackButton } from '../components/AuthBackButton';
 import { AuthBrandHeader } from '../components/AuthBrandHeader';
@@ -16,22 +16,17 @@ import { AuthScaffold } from '../components/AuthScaffold';
 import { AuthTextField } from '../components/AuthTextField';
 import { PendingOwnerBanner } from '../components/PendingOwnerBanner';
 import { PrimaryButton } from '../components/PrimaryButton';
-import { getPendingOwnerEmail, setPendingOwnerEmail, setTokens } from '../lib/storage';
 import type { AuthStackParamList } from '../navigation/AuthStack';
+import { useAuth } from '../context/AuthContext';
 import { ApiRequestError, apiRequest } from '../services/api';
+import { getPendingOwnerEmail, setPendingOwnerEmail, setTokens } from '../lib/storage';
+import type { AuthResponse } from '../types/user';
 
 type Props = NativeStackScreenProps<AuthStackParamList, 'Register'> & {
   onAuthenticated: () => void;
 };
 
 type Role = 'client' | 'showroom_owner';
-
-type AuthResponse = {
-  access_token: string | null;
-  refresh_token?: string | null;
-  profile: { role: string; status: string };
-  message?: string;
-};
 
 const OWNER_PENDING_ALERT = {
   title: 'Registration pending',
@@ -49,6 +44,7 @@ const OWNER_SUBMITTED_ALERT = {
 const ENFORCE_OWNER_PENDING_LOCK = true;
 
 export function RegisterScreen({ navigation, onAuthenticated }: Props) {
+  const { setProfile } = useAuth();
   const [role, setRole] = useState<Role>('client');
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
@@ -146,6 +142,7 @@ export function RegisterScreen({ navigation, onAuthenticated }: Props) {
 
       if (data.access_token) {
         await setTokens(data.access_token, data.refresh_token);
+        setProfile(data.profile);
         onAuthenticated();
         return;
       }

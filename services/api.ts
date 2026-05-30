@@ -29,6 +29,10 @@ export async function apiRequest<T>(
     },
   });
 
+  if (res.status === 204) {
+    return undefined as T;
+  }
+
   const data = await res.json().catch(() => ({}));
 
   if (!res.ok || data?.success === false) {

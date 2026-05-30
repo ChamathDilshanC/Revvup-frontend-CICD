@@ -1,7 +1,7 @@
 import React from 'react';
-import { View, Text } from 'react-native';
+import { Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { PrimaryButton } from '../../components/PrimaryButton';
+import { PrimaryButton } from '../components/PrimaryButton';
 
 export function ProfileScreen() {
   return (
