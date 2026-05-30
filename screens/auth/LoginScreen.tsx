@@ -1,13 +1,13 @@
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import React, { useRef, useState } from 'react';
 import { Alert, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
-import { AuthBrandHeader } from '../components/AuthBrandHeader';
-import { AuthScaffold } from '../components/AuthScaffold';
-import { AuthTextField } from '../components/AuthTextField';
-import { PrimaryButton } from '../components/PrimaryButton';
-import type { AuthStackParamList } from '../navigation/AuthStack';
-import { ApiRequestError, apiRequest } from '../services/api';
-import { clearPendingOwnerEmail, setTokens } from '../lib/storage';
+import { AuthBrandHeader } from '../../components/AuthBrandHeader';
+import { AuthScaffold } from '../../components/AuthScaffold';
+import { AuthTextField } from '../../components/AuthTextField';
+import { PrimaryButton } from '../../components/PrimaryButton';
+import type { AuthStackParamList } from '../../navigation/AuthStack';
+import { ApiRequestError, apiRequest } from '../../services/api';
+import { clearPendingOwnerEmail, setTokens, setUserRole, type UserRole } from '../../lib/storage';
 
 type Props = NativeStackScreenProps<AuthStackParamList, 'Login'> & {
   onAuthenticated: () => void;
@@ -41,6 +41,8 @@ export function LoginScreen({ navigation, onAuthenticated }: Props) {
         await setTokens(data.access_token, data.refresh_token);
         await clearPendingOwnerEmail();
       }
+      const role = (data.profile?.role as UserRole) || 'client';
+      await setUserRole(role);
       onAuthenticated();
     } catch (e) {
       if (e instanceof ApiRequestError && e.code === 'ACCOUNT_PENDING') {

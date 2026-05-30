@@ -1,21 +1,21 @@
 import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Ionicons } from '@expo/vector-icons';
-import { ExploreScreen } from '../screens/client/ExploreScreen';
-import { CatalogScreen } from '../screens/client/CatalogScreen';
-import { DetailsScreen } from '../screens/client/DetailsScreen';
+import { DashboardScreen } from '../screens/owner/DashboardScreen';
+import { ManageInventoryScreen } from '../screens/owner/ManageInventoryScreen';
+import { AddEditBikeScreen } from '../screens/owner/AddEditBikeScreen';
 import { ProfileScreen } from '../screens/client/ProfileScreen';
 
-export type RootTabParamList = {
-  Explore: undefined;
-  Catalog: undefined;
-  Details: { bikeId?: string } | undefined;
+export type OwnerTabParamList = {
+  Dashboard: undefined;
+  Inventory: undefined;
+  AddBike: undefined;
   Profile: undefined;
 };
 
-const Tab = createBottomTabNavigator<RootTabParamList>();
+const Tab = createBottomTabNavigator<OwnerTabParamList>();
 
-export function RootTabs() {
+export function OwnerTabs() {
   return (
     <Tab.Navigator
       screenOptions={{
@@ -29,25 +29,25 @@ export function RootTabs() {
       }}
     >
       <Tab.Screen
-        name="Explore"
-        component={ExploreScreen}
+        name="Dashboard"
+        component={DashboardScreen}
         options={{
-          tabBarIcon: ({ color, size }) => <Ionicons name="compass-outline" size={size} color={color} />,
+          tabBarIcon: ({ color, size }) => <Ionicons name="grid-outline" size={size} color={color} />,
         }}
       />
       <Tab.Screen
-        name="Catalog"
-        component={CatalogScreen}
+        name="Inventory"
+        component={ManageInventoryScreen}
         options={{
-          tabBarIcon: ({ color, size }) => <Ionicons name="bicycle-outline" size={size} color={color} />,
+          tabBarIcon: ({ color, size }) => <Ionicons name="list-outline" size={size} color={color} />,
         }}
       />
       <Tab.Screen
-        name="Details"
-        component={DetailsScreen}
-        initialParams={{ bikeId: '1' }}
+        name="AddBike"
+        component={AddEditBikeScreen}
         options={{
-          tabBarIcon: ({ color, size }) => <Ionicons name="information-circle-outline" size={size} color={color} />,
+          title: 'Add',
+          tabBarIcon: ({ color, size }) => <Ionicons name="add-circle-outline" size={size} color={color} />,
         }}
       />
       <Tab.Screen
