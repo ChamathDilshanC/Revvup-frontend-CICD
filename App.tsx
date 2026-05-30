@@ -1,9 +1,14 @@
 import './global.css';
-import React from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { StatusBar } from 'expo-status-bar';
+import * as SplashScreen from 'expo-splash-screen';
 import { NavigationContainer, DarkTheme } from '@react-navigation/native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
-import { RootTabs } from './navigation/RootTabs';
+import { AppSplash } from './components/AppSplash';
+import { preloadAuthAssets } from './lib/preloadAssets';
+import { RootNavigator } from './navigation/RootNavigator';
+
+SplashScreen.preventAutoHideAsync();
 
 const revvupTheme = {
   ...DarkTheme,
@@ -18,11 +23,37 @@ const revvupTheme = {
 };
 
 export default function App() {
+  const [appReady, setAppReady] = useState(false);
+
+  useEffect(() => {
+    async function prepare() {
+      await preloadAuthAssets();
+      await SplashScreen.hideAsync();
+      setAppReady(true);
+    }
+    prepare();
+  }, []);
+
+  const onLayoutRootView = useCallback(async () => {
+    if (appReady) {
+      await SplashScreen.hideAsync();
+    }
+  }, [appReady]);
+
+  if (!appReady) {
+    return (
+      <>
+        <StatusBar style="light" />
+        <AppSplash />
+      </>
+    );
+  }
+
   return (
-    <SafeAreaProvider>
+    <SafeAreaProvider onLayout={onLayoutRootView}>
       <NavigationContainer theme={revvupTheme}>
         <StatusBar style="light" />
-        <RootTabs />
+        <RootNavigator />
       </NavigationContainer>
     </SafeAreaProvider>
   );

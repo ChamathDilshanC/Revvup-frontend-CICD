@@ -1,5 +1,6 @@
 import React from 'react';
-import { View, Text, Image, Pressable } from 'react-native';
+import { View, Text, Pressable } from 'react-native';
+import { AppImage } from './AppImage';
 import { colors } from '../theme/colors';
 
 export interface BikeCardProps {
@@ -18,7 +19,7 @@ export function BikeCard({ id, name, brand, price, imageUrl, topSpeed, onPress }
       onPress={() => onPress?.(id)}
       className="mb-4 overflow-hidden rounded-2xl bg-[#141416] border border-[#2A2A2E]"
     >
-      <Image source={{ uri: imageUrl }} className="h-44 w-full" resizeMode="cover" />
+      <AppImage source={{ uri: imageUrl }} className="h-44 w-full" resizeMode="cover" />
       <View className="p-4">
         <Text className="text-xs uppercase tracking-widest text-gray-400">{brand}</Text>
         <Text className="mt-1 text-lg font-semibold text-white">{name}</Text>
