@@ -11,6 +11,7 @@ export function AppSplash() {
         source={APP_LOGO}
         style={styles.logo}
         resizeMode="contain"
+        tintColor="#F5F5F7"
         accessibilityLabel="RevvUp logo"
       />
     </View>

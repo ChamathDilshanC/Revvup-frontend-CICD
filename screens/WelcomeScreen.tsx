@@ -23,7 +23,12 @@ export function WelcomeScreen({ onContinue }: WelcomeScreenProps) {
 
       <SafeAreaView style={styles.safe} edges={['top', 'bottom']}>
         <View style={styles.content}>
-          <AppImage source={APP_LOGO} style={styles.logo} resizeMode="contain" />
+          <AppImage
+            source={APP_LOGO}
+            style={styles.logo}
+            resizeMode="contain"
+            tintColor="#F5F5F7"
+          />
           <Text style={styles.title}>Welcome to RevvUp</Text>
           <Text style={styles.subtitle}>
             Sri Lanka&apos;s premium motorbike marketplace — discover superbikes, compare specs, and

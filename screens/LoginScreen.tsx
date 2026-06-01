@@ -1,14 +1,15 @@
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Alert, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 import { AuthBrandHeader } from '../components/AuthBrandHeader';
 import { AuthScaffold } from '../components/AuthScaffold';
 import { AuthTextField } from '../components/AuthTextField';
 import { PrimaryButton } from '../components/PrimaryButton';
+import { useOwnerApprovalWatcher } from '../hooks/useOwnerApprovalWatcher';
 import type { AuthStackParamList } from '../navigation/AuthStack';
 import { useAuth } from '../context/AuthContext';
 import { ApiRequestError, apiRequest } from '../services/api';
-import { clearPendingOwnerEmail, setTokens } from '../lib/storage';
+import { clearPendingOwnerEmail, getPendingOwnerEmail, setTokens } from '../lib/storage';
 import type { AuthResponse } from '../types/user';
 
 type Props = NativeStackScreenProps<AuthStackParamList, 'Login'> & {
@@ -21,6 +22,14 @@ export function LoginScreen({ navigation, onAuthenticated }: Props) {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const passwordRef = useRef<TextInput>(null);
+
+  useEffect(() => {
+    getPendingOwnerEmail().then((stored) => {
+      if (stored) setEmail(stored);
+    });
+  }, []);
+
+  useOwnerApprovalWatcher({ email });
 
   async function handleLogin() {
     if (!email.trim() || !password) {

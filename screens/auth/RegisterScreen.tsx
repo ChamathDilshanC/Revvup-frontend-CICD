@@ -4,7 +4,6 @@ import {
     Alert,
     BackHandler,
     Pressable,
-    ScrollView,
     StyleSheet,
     Text,
     TextInput,
@@ -16,6 +15,7 @@ import { AuthScaffold } from '../components/AuthScaffold';
 import { AuthTextField } from '../components/AuthTextField';
 import { PendingOwnerBanner } from '../components/PendingOwnerBanner';
 import { PrimaryButton } from '../components/PrimaryButton';
+import { useOwnerApprovalWatcher } from '../hooks/useOwnerApprovalWatcher';
 import { getPendingOwnerEmail, setPendingOwnerEmail, setTokens } from '../lib/storage';
 import type { AuthStackParamList } from '../navigation/AuthStack';
 import { ApiRequestError, apiRequest } from '../services/api';
@@ -42,7 +42,13 @@ const OWNER_PENDING_ALERT = {
 const OWNER_SUBMITTED_ALERT = {
   title: 'Application submitted',
   message:
-    'Thank you for registering your showroom. Your account is pending approval — we have notified the RevvUp team by email. You cannot register again while pending. Once approved, return here and sign in with the same email and password you just created.',
+    'Thank you for registering your showroom. Your account is pending approval — we have notified the RevvUp team by email. Once approved, return here and sign in with the same email and password you just created.',
+};
+
+const OWNER_EXISTS_ALERT = {
+  title: 'Showroom owner account exists',
+  message:
+    'This showroom or phone number already has a showroom owner account. Please sign in, or register as a client with a different email.',
 };
 
 /** Blocks repeat showroom register while pending (local storage + API). */
@@ -58,21 +64,23 @@ export function RegisterScreen({ navigation, onAuthenticated }: Props) {
   const [phone, setPhone] = useState('');
   const [loading, setLoading] = useState(false);
   const [pendingOwnerEmail, setPendingOwnerEmailState] = useState<string | null>(null);
+  const [ownerExistsLockKey, setOwnerExistsLockKey] = useState<string | null>(null);
 
   const emailRef = useRef<TextInput>(null);
   const passwordRef = useRef<TextInput>(null);
   const showroomNameRef = useRef<TextInput>(null);
   const addressRef = useRef<TextInput>(null);
   const phoneRef = useRef<TextInput>(null);
+  const allowLeaveRef = useRef(false);
 
-  const normalizedEmail = email.trim().toLowerCase();
-  const isOwnerPendingLocked =
-    ENFORCE_OWNER_PENDING_LOCK &&
-    role === 'showroom_owner' &&
-    Boolean(pendingOwnerEmail) &&
-    normalizedEmail === pendingOwnerEmail;
+  const hasPendingOwnerLock = ENFORCE_OWNER_PENDING_LOCK && Boolean(pendingOwnerEmail);
+  const isOwnerPendingLocked = hasPendingOwnerLock && role === 'showroom_owner';
 
   const showShowroomFields = role === 'showroom_owner' && !isOwnerPendingLocked;
+  const currentOwnerKey = `${showroomName.trim().toLowerCase()}|${phone.trim().toLowerCase()}`;
+  const isOwnerExistsLocked =
+    role === 'showroom_owner' && Boolean(ownerExistsLockKey) && ownerExistsLockKey === currentOwnerKey;
+  const isRegisterDisabled = isOwnerPendingLocked || isOwnerExistsLocked;
 
   useEffect(() => {
     if (!ENFORCE_OWNER_PENDING_LOCK) return;
@@ -86,20 +94,40 @@ export function RegisterScreen({ navigation, onAuthenticated }: Props) {
   }, []);
 
   const goToLogin = useCallback(() => {
-    if (navigation.canGoBack()) {
-      navigation.goBack();
-    } else {
-      navigation.navigate('Login');
-    }
+    allowLeaveRef.current = true;
+    navigation.replace('Login');
+  }, [navigation]);
+
+  const handleOwnerApproved = useCallback(() => {
+    setPendingOwnerEmailState(null);
+    setOwnerExistsLockKey(null);
+    setRole('client');
+  }, []);
+
+  useOwnerApprovalWatcher({
+    email: pendingOwnerEmail ?? email,
+    onApproved: handleOwnerApproved,
+    navigateToLogin: goToLogin,
+  });
+
+  useEffect(() => {
+    navigation.setOptions({ gestureEnabled: false, fullScreenGestureEnabled: false });
+    const unsub = navigation.addListener('beforeRemove', (event) => {
+      if (allowLeaveRef.current) return;
+      if (event.data.action.type === 'GO_BACK' || event.data.action.type === 'POP') {
+        event.preventDefault();
+      }
+    });
+    return unsub;
   }, [navigation]);
 
   useEffect(() => {
     const sub = BackHandler.addEventListener('hardwareBackPress', () => {
-      goToLogin();
+      // Keep entered values intact by blocking Android hardware back on this screen.
       return true;
     });
     return () => sub.remove();
-  }, [goToLogin]);
+  }, []);
 
   const showOwnerPendingAlert = useCallback(() => {
     Alert.alert(OWNER_PENDING_ALERT.title, OWNER_PENDING_ALERT.message, [
@@ -117,6 +145,13 @@ export function RegisterScreen({ navigation, onAuthenticated }: Props) {
   async function handleRegister() {
     if (isOwnerPendingLocked) {
       showOwnerPendingAlert();
+      return;
+    }
+    if (isOwnerExistsLocked) {
+      Alert.alert(OWNER_EXISTS_ALERT.title, OWNER_EXISTS_ALERT.message, [
+        { text: 'OK' },
+        { text: 'Go to Sign in', onPress: goToLogin },
+      ]);
       return;
     }
 
@@ -151,6 +186,7 @@ export function RegisterScreen({ navigation, onAuthenticated }: Props) {
       }
 
       if (role === 'showroom_owner') {
+        setOwnerExistsLockKey(currentOwnerKey);
         if (ENFORCE_OWNER_PENDING_LOCK) await markOwnerPending(email);
         Alert.alert(OWNER_SUBMITTED_ALERT.title, data.message ?? OWNER_SUBMITTED_ALERT.message, [
           { text: 'OK' },
@@ -166,6 +202,14 @@ export function RegisterScreen({ navigation, onAuthenticated }: Props) {
       if (ENFORCE_OWNER_PENDING_LOCK && e instanceof ApiRequestError && e.code === 'OWNER_PENDING') {
         await markOwnerPending(email);
         showOwnerPendingAlert();
+        return;
+      }
+      if (e instanceof ApiRequestError && e.code === 'OWNER_ALREADY_EXISTS') {
+        setOwnerExistsLockKey(currentOwnerKey);
+        Alert.alert(OWNER_EXISTS_ALERT.title, e.message || OWNER_EXISTS_ALERT.message, [
+          { text: 'OK' },
+          { text: 'Go to Sign in', onPress: goToLogin },
+        ]);
         return;
       }
       const message = e instanceof Error ? e.message : 'Try again.';
@@ -189,24 +233,19 @@ export function RegisterScreen({ navigation, onAuthenticated }: Props) {
                 label="Client"
                 active={role === 'client'}
                 onPress={() => setRole('client')}
-                disabled={isOwnerPendingLocked}
+                disabled={false}
               />
               <RoleChip
                 label="Showroom owner"
                 active={role === 'showroom_owner'}
-                onPress={() => !isOwnerPendingLocked && setRole('showroom_owner')}
-                disabled={isOwnerPendingLocked}
+                onPress={() => !hasPendingOwnerLock && setRole('showroom_owner')}
+                disabled={hasPendingOwnerLock}
               />
             </View>
           </AuthBrandHeader>
         </View>
 
-        <ScrollView
-          style={styles.formScroll}
-          contentContainerStyle={styles.form}
-          keyboardShouldPersistTaps="handled"
-          showsVerticalScrollIndicator={false}
-        >
+        <View style={styles.form}>
           {isOwnerPendingLocked && pendingOwnerEmail ? (
             <PendingOwnerBanner email={pendingOwnerEmail} />
           ) : null}
@@ -290,17 +329,17 @@ export function RegisterScreen({ navigation, onAuthenticated }: Props) {
           )}
 
           <PrimaryButton
-            label={isOwnerPendingLocked ? 'Registration pending' : 'Register'}
+            label={isRegisterDisabled ? 'Registration unavailable' : 'Register'}
             onPress={handleRegister}
             loading={loading}
-            disabled={isOwnerPendingLocked}
+            disabled={isRegisterDisabled}
           />
           <Pressable onPress={goToLogin} style={styles.linkWrap}>
             <Text style={styles.link}>
               Already have an account? <Text style={styles.linkBold}>Sign in</Text>
             </Text>
           </Pressable>
-        </ScrollView>
+        </View>
       </View>
     </AuthScaffold>
   );
@@ -367,14 +406,11 @@ const styles = StyleSheet.create({
   chipTextActive: {
     color: '#FFF',
   },
-  formScroll: {
-    flex: 1,
-    marginTop: 8,
-  },
   form: {
     flexGrow: 1,
-    justifyContent: 'flex-end',
-    paddingBottom: 8,
+    justifyContent: 'flex-start',
+    marginTop: 8,
+    paddingBottom: 12,
   },
   linkWrap: {
     marginTop: 16,

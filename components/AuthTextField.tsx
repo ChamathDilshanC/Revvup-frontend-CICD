@@ -1,5 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
-import React, { forwardRef, useMemo, useState } from 'react';
+import React, { forwardRef, useImperativeHandle, useRef, useState } from 'react';
 import {
   Pressable,
   StyleSheet,
@@ -8,7 +8,16 @@ import {
   type TextInputProps,
   View,
 } from 'react-native';
-import { useTheme } from '../context/ThemeContext';
+
+/** Glass inputs for Login/Register — always translucent on the dark hero background. */
+const AUTH = {
+  label: 'rgba(255,255,255,0.75)',
+  text: '#F5F5F7',
+  placeholder: 'rgba(255,255,255,0.42)',
+  fieldBg: 'rgba(255,255,255,0.1)',
+  fieldBorder: 'rgba(255,255,255,0.2)',
+  icon: 'rgba(255,255,255,0.65)',
+} as const;
 
 type AuthTextFieldProps = TextInputProps & {
   label: string;
@@ -19,53 +28,25 @@ export const AuthTextField = forwardRef<TextInput, AuthTextFieldProps>(function 
   ref,
 ) {
   const [passwordVisible, setPasswordVisible] = useState(false);
+  const inputRef = useRef<TextInput>(null);
   const isPasswordField = secureTextEntry === true;
-  const { colors, isDark } = useTheme();
 
-  const styles = useMemo(
-    () =>
-      StyleSheet.create({
-        wrap: { marginBottom: 14 },
-        label: {
-          color: colors.textSecondary,
-          fontSize: 13,
-          marginBottom: 6,
-          fontWeight: '500',
-        },
-        inputRow: {
-          position: 'relative',
-          justifyContent: 'center',
-        },
-        input: {
-          backgroundColor: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(255,255,255,0.92)',
-          borderWidth: 1,
-          borderColor: isDark ? 'rgba(255,255,255,0.12)' : 'rgba(0,0,0,0.08)',
-          borderRadius: 12,
-          paddingHorizontal: 16,
-          paddingVertical: 14,
-          color: isDark ? colors.text : '#111827',
-          fontSize: 16,
-        },
-        inputWithToggle: { paddingRight: 48 },
-        inputDisabled: { opacity: 0.55 },
-        toggle: {
-          position: 'absolute',
-          right: 14,
-          height: '100%',
-          justifyContent: 'center',
-          paddingHorizontal: 4,
-        },
-      }),
-    [colors, isDark],
-  );
+  useImperativeHandle(ref, () => inputRef.current as TextInput);
+
+  const focusInput = () => {
+    if (editable) inputRef.current?.focus();
+  };
 
   return (
     <View style={styles.wrap}>
-      <Text style={styles.label}>{label}</Text>
+      <Pressable onPress={focusInput} hitSlop={6}>
+        <Text style={styles.label}>{label}</Text>
+      </Pressable>
       <View style={styles.inputRow}>
         <TextInput
-          ref={ref}
-          placeholderTextColor={colors.placeholder}
+          ref={inputRef}
+          placeholderTextColor={AUTH.placeholder}
+          showSoftInputOnFocus
           style={[
             styles.input,
             isPasswordField && styles.inputWithToggle,
@@ -87,11 +68,52 @@ export const AuthTextField = forwardRef<TextInput, AuthTextFieldProps>(function 
             <Ionicons
               name={passwordVisible ? 'eye-off-outline' : 'eye-outline'}
               size={22}
-              color={colors.textSecondary}
+              color={AUTH.icon}
             />
           </Pressable>
         ) : null}
       </View>
     </View>
   );
+});
+
+const styles = StyleSheet.create({
+  wrap: {
+    marginBottom: 14,
+  },
+  label: {
+    color: AUTH.label,
+    fontSize: 13,
+    marginBottom: 6,
+    fontWeight: '500',
+  },
+  inputRow: {
+    position: 'relative',
+    justifyContent: 'center',
+  },
+  input: {
+    backgroundColor: AUTH.fieldBg,
+    borderWidth: 1,
+    borderColor: AUTH.fieldBorder,
+    borderRadius: 12,
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+    color: AUTH.text,
+    fontSize: 16,
+  },
+  inputWithToggle: {
+    paddingRight: 48,
+  },
+  inputDisabled: {
+    opacity: 0.55,
+  },
+  toggle: {
+    position: 'absolute',
+    right: 14,
+    top: 0,
+    bottom: 0,
+    justifyContent: 'center',
+    paddingHorizontal: 4,
+    zIndex: 1,
+  },
 });

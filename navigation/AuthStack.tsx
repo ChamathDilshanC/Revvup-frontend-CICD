@@ -30,8 +30,8 @@ export function AuthStack({ onAuthenticated }: AuthStackProps) {
       <Stack.Screen
         name="Register"
         options={{
-          gestureEnabled: true,
-          fullScreenGestureEnabled: true,
+          gestureEnabled: false,
+          fullScreenGestureEnabled: false,
           animation: 'slide_from_right',
         }}
       >

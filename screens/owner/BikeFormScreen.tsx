@@ -118,8 +118,9 @@ export function BikeFormScreen({ navigation, route }: Props) {
             'Photo not uploaded',
             uploadErr instanceof Error
               ? uploadErr.message
-              : 'Bike was saved, but the image could not be uploaded. Try editing the bike and adding the photo again.',
+              : 'Bike was saved, but the photo could not be uploaded. Tap Save again or edit the bike to retry.',
           );
+          return;
         }
       }
 
