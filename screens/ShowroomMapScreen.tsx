@@ -8,9 +8,9 @@ import { hasMapCoordinates } from '../constants/map';
 import { openInMaps } from '../lib/openMaps';
 import { ScreenBackButton } from '../components/ScreenBackButton';
 import { useTheme } from '../context/ThemeContext';
-import type { ExploreStackParamList } from '../navigation/ExploreStack';
+import type { BikeFlowParamList } from '../navigation/bikeFlowParams';
 
-type Props = NativeStackScreenProps<ExploreStackParamList, 'ShowroomMap'>;
+type Props = NativeStackScreenProps<BikeFlowParamList, 'ShowroomMap'>;
 
 export function ShowroomMapScreen({ navigation, route }: Props) {
   const { showroomName, showroomAddress, latitude, longitude } = route.params;

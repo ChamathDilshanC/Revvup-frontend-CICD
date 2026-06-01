@@ -4,7 +4,7 @@ import React from 'react';
 import { Alert, Pressable, Text, View } from 'react-native';
 import { useTheme } from '../context/ThemeContext';
 import type { BikeImageUpload } from '../services/bikes';
-import { AppImage } from './AppImage';
+import { BikeShowcaseImage } from './BikeShowcaseImage';
 
 export type PickedBikeImage = BikeImageUpload;
 
@@ -54,7 +54,7 @@ export function BikePhotoPicker({ previewUri, showRemove, onImageChange }: Props
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ['images'],
       allowsEditing: true,
-      aspect: [4, 3],
+      aspect: [16, 10],
       quality: 0.85,
     });
     if (result.canceled || !result.assets?.[0]) return;
@@ -65,7 +65,7 @@ export function BikePhotoPicker({ previewUri, showRemove, onImageChange }: Props
     if (!(await ensureCameraPermission())) return;
     const result = await ImagePicker.launchCameraAsync({
       allowsEditing: true,
-      aspect: [4, 3],
+      aspect: [16, 10],
       quality: 0.85,
     });
     if (result.canceled || !result.assets?.[0]) return;
@@ -76,17 +76,22 @@ export function BikePhotoPicker({ previewUri, showRemove, onImageChange }: Props
     <View className="mb-4">
       <Text className={classes.inputLabel}>Bike photo</Text>
 
-      <Pressable onPress={pickFromGallery} className={classes.photoPicker}>
+      <Text className={`${classes.bodyXs} mb-2`}>
+        Use the crop tool to frame the bike. Plain or dark backgrounds look best in Explore; PNG
+        without a background is ideal.
+      </Text>
+
+      <Pressable onPress={pickFromGallery} className="overflow-hidden rounded-2xl border border-dashed border-[#3A3A40]">
         {previewUri ? (
           <View>
-            <AppImage source={{ uri: previewUri }} style={{ width: '100%', height: 200 }} />
-            <View className="absolute bottom-0 left-0 right-0 flex-row items-center justify-center gap-2 bg-black/50 py-2">
+            <BikeShowcaseImage uri={previewUri} variant="circle" size={180} />
+            <View className="absolute bottom-0 left-0 right-0 flex-row items-center justify-center gap-2 bg-black/55 py-2.5">
               <Ionicons name="images-outline" size={18} color="#F5F5F7" />
               <Text className="text-sm font-medium text-white">Tap to change photo</Text>
             </View>
           </View>
         ) : (
-          <View className="items-center justify-center px-6 py-10">
+          <View className={`${classes.photoPicker} items-center justify-center px-6 py-10`}>
             <View className={`${classes.photoPickerInner} mb-3`}>
               <Ionicons name="camera-outline" size={28} color={colors.textSecondary} />
             </View>

@@ -16,7 +16,13 @@
       "supportsTablet": true,
       "bundleIdentifier": "com.revvup.app",
       "infoPlist": {
-        "LSApplicationQueriesSchemes": ["app-settings", "App-Prefs", "prefs"]
+        "LSApplicationQueriesSchemes": [
+          "tel",
+          "telprompt",
+          "app-settings",
+          "App-Prefs",
+          "prefs"
+        ]
       }
     },
     "android": {
@@ -24,14 +30,29 @@
         "foregroundImage": "./assets/AppLogo.png",
         "backgroundColor": "#000000"
       },
-      "package": "com.revvup.app"
+      "package": "com.revvup.app",
+      "intentQueries": [
+        {
+          "action": "android.intent.action.DIAL",
+          "data": [
+            {
+              "scheme": "tel"
+            }
+          ]
+        }
+      ]
     },
     "web": {
       "favicon": "./assets/AppLogo.png",
       "bundler": "metro"
     },
     "plugins": [
-      "expo-location",
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "RevvUp uses your location to show bikes and showrooms in your province."
+        }
+      ],
       [
         "expo-image-picker",
         {
@@ -47,6 +68,20 @@
           "image": "./assets/AppLogo.png",
           "resizeMode": "contain",
           "backgroundColor": "#000000"
+        }
+      ],
+      "@react-native-community/datetimepicker",
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Allow RevvUp to scan rental booking QR codes at pickup."
+        }
+      ],
+      [
+        "expo-media-library",
+        {
+          "photosPermission": "Allow RevvUp to save your booking QR code to Photos.",
+          "savePhotosPermission": "Allow RevvUp to save your booking QR code to Photos."
         }
       ]
     ]

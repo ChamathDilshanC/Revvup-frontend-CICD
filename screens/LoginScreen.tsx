@@ -5,9 +5,8 @@ import { AuthBrandHeader } from '../components/AuthBrandHeader';
 import { AuthScaffold } from '../components/AuthScaffold';
 import { AuthTextField } from '../components/AuthTextField';
 import { PrimaryButton } from '../components/PrimaryButton';
-import { useOwnerApprovalWatcher } from '../hooks/useOwnerApprovalWatcher';
-import type { AuthStackParamList } from '../navigation/AuthStack';
 import { useAuth } from '../context/AuthContext';
+import type { AuthStackParamList } from '../navigation/AuthStack';
 import { ApiRequestError, apiRequest } from '../services/api';
 import { clearPendingOwnerEmail, getPendingOwnerEmail, setTokens } from '../lib/storage';
 import type { AuthResponse } from '../types/user';
@@ -28,8 +27,6 @@ export function LoginScreen({ navigation, onAuthenticated }: Props) {
       if (stored) setEmail(stored);
     });
   }, []);
-
-  useOwnerApprovalWatcher({ email });
 
   async function handleLogin() {
     if (!email.trim() || !password) {

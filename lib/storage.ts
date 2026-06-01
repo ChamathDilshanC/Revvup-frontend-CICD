@@ -7,9 +7,12 @@ const KEYS = {
   pendingOwnerEmail: '@revvup/pending_owner_email',
   profile: '@revvup/profile',
   themePreference: '@revvup/theme_preference',
+  currencyPreference: '@revvup/currency_preference',
+  clientProvince: '@revvup/client_province',
 } as const;
 
 export type StoredThemePreference = 'dark' | 'light';
+export type CurrencyCode = 'USD' | 'LKR';
 
 export async function getHasSeenWelcome(): Promise<boolean> {
   const v = await AsyncStorage.getItem(KEYS.hasSeenWelcome);
@@ -66,4 +69,25 @@ export async function getThemePreference(): Promise<StoredThemePreference | null
 
 export async function setThemePreference(value: StoredThemePreference): Promise<void> {
   await AsyncStorage.setItem(KEYS.themePreference, value);
+}
+
+export async function getCurrencyPreference(): Promise<CurrencyCode | null> {
+  const v = await AsyncStorage.getItem(KEYS.currencyPreference);
+  return v === 'USD' || v === 'LKR' ? v : null;
+}
+
+export async function setCurrencyPreference(value: CurrencyCode): Promise<void> {
+  await AsyncStorage.setItem(KEYS.currencyPreference, value);
+}
+
+export async function getClientProvince(): Promise<string | null> {
+  return AsyncStorage.getItem(KEYS.clientProvince);
+}
+
+export async function setClientProvince(value: string | null): Promise<void> {
+  if (!value) {
+    await AsyncStorage.removeItem(KEYS.clientProvince);
+    return;
+  }
+  await AsyncStorage.setItem(KEYS.clientProvince, value);
 }

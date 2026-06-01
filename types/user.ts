@@ -9,6 +9,7 @@ export type Profile = {
   status: UserStatus;
   showroom_name: string | null;
   showroom_address: string | null;
+  showroom_province?: string | null;
   phone: string | null;
   latitude: number | null;
   longitude: number | null;

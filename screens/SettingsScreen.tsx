@@ -4,12 +4,14 @@ import React from 'react';
 import { Pressable, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ScreenBackButton } from '../components/ScreenBackButton';
+import { useCurrency } from '../context/CurrencyContext';
 import { useTheme } from '../context/ThemeContext';
 import type { ProfileStackParamList } from '../navigation/ProfileStack';
 type Props = NativeStackScreenProps<ProfileStackParamList, 'Settings'>;
 
 export function SettingsScreen({ navigation }: Props) {
   const { preference, setPreference, colors, classes } = useTheme();
+  const { currency, setCurrency } = useCurrency();
 
   return (
     <SafeAreaView className={classes.screen}>
@@ -22,6 +24,32 @@ export function SettingsScreen({ navigation }: Props) {
         <Text className={classes.subtitle}>App preferences on this device</Text>
 
         <View className={`${classes.cardPadded} mt-8`}>
+          <Text className={classes.sectionLabel}>Currency</Text>
+          <Text className={`${classes.bodySm} mb-4`}>
+            Choose how prices appear in Explore and bike details. Changes apply immediately on this
+            device.
+          </Text>
+
+          <CurrencyOption
+            icon="cash-outline"
+            label="Sri Lankan Rupee (LKR)"
+            description="Show prices in rupees"
+            selected={currency === 'LKR'}
+            onPress={() => void setCurrency('LKR')}
+            colors={colors}
+          />
+          <View className="my-3 h-px bg-gray-200 dark:bg-[#2A2A2E]" />
+          <CurrencyOption
+            icon="logo-usd"
+            label="US Dollar (USD)"
+            description="Show prices in US dollars"
+            selected={currency === 'USD'}
+            onPress={() => void setCurrency('USD')}
+            colors={colors}
+          />
+        </View>
+
+        <View className={`${classes.cardPadded} mt-6`}>
           <Text className={classes.sectionLabel}>Appearance</Text>
           <Text className={`${classes.bodySm} mb-4`}>
             Dark mode is the default RevvUp look. Switch to light for a brighter interface.
@@ -50,6 +78,33 @@ export function SettingsScreen({ navigation }: Props) {
   );
 }
 
+function CurrencyOption({
+  icon,
+  label,
+  description,
+  selected,
+  onPress,
+  colors,
+}: {
+  icon: 'cash-outline' | 'logo-usd';
+  label: string;
+  description: string;
+  selected: boolean;
+  onPress: () => void;
+  colors: { primary: string; text: string; textSecondary: string; border: string; surface: string };
+}) {
+  return (
+    <PreferenceOption
+      icon={icon}
+      label={label}
+      description={description}
+      selected={selected}
+      onPress={onPress}
+      colors={colors}
+    />
+  );
+}
+
 function ThemeOption({
   icon,
   label,
@@ -59,6 +114,33 @@ function ThemeOption({
   colors,
 }: {
   icon: 'moon' | 'sunny';
+  label: string;
+  description: string;
+  selected: boolean;
+  onPress: () => void;
+  colors: { primary: string; text: string; textSecondary: string; border: string; surface: string };
+}) {
+  return (
+    <PreferenceOption
+      icon={icon}
+      label={label}
+      description={description}
+      selected={selected}
+      onPress={onPress}
+      colors={colors}
+    />
+  );
+}
+
+function PreferenceOption({
+  icon,
+  label,
+  description,
+  selected,
+  onPress,
+  colors,
+}: {
+  icon: keyof typeof Ionicons.glyphMap;
   label: string;
   description: string;
   selected: boolean;

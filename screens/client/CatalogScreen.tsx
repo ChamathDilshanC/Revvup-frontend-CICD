@@ -8,7 +8,7 @@ const PLACEHOLDER_BIKES = [
     id: '1',
     name: 'Panigale V4 S',
     brand: 'Ducati',
-    price: 28995,
+    priceUsd: 28995,
     imageUrl: 'https://images.unsplash.com/photo-1558981403-c5f9899a28bc?w=800',
     topSpeed: 186,
   },

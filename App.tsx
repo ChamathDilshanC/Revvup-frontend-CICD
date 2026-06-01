@@ -7,6 +7,7 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { AppSplash } from './components/AppSplash';
 import { preloadAuthAssets } from './lib/preloadAssets';
 import { AuthProvider } from './context/AuthContext';
+import { CurrencyProvider } from './context/CurrencyContext';
 import { ThemeProvider, useTheme } from './context/ThemeContext';
 import { RootNavigator } from './navigation/RootNavigator';
 
@@ -78,9 +79,11 @@ export default function App() {
   return (
     <SafeAreaProvider onLayout={onLayoutRootView}>
       <ThemeProvider>
-        <AuthProvider>
-          <AppNavigation />
-        </AuthProvider>
+        <CurrencyProvider>
+          <AuthProvider>
+            <AppNavigation />
+          </AuthProvider>
+        </CurrencyProvider>
       </ThemeProvider>
     </SafeAreaProvider>
   );

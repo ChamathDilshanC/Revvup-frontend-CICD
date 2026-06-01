@@ -6,9 +6,15 @@ import { useTheme } from '../context/ThemeContext';
 import { ExploreStack } from './ExploreStack';
 import { ManageStack } from './ManageStack';
 import { ProfileStack } from './ProfileStack';
+import { ClientRentalsStack } from './ClientRentalsStack';
+import { OwnerRentalsStack } from './OwnerRentalsStack';
+import { RentStack } from './RentStack';
 
 export type RootTabParamList = {
   Explore: undefined;
+  Rent: undefined;
+  MyRentals: undefined;
+  OwnerRentals: undefined;
   Manage: undefined;
   Profile: undefined;
 };
@@ -16,7 +22,7 @@ export type RootTabParamList = {
 const Tab = createBottomTabNavigator<RootTabParamList>();
 
 export function RootTabs() {
-  const { isOwner } = useAuth();
+  const { isOwner, isClient } = useAuth();
   const { colors } = useTheme();
 
   return (
@@ -43,13 +49,50 @@ export function RootTabs() {
           }}
         />
       ) : null}
+      {isOwner ? (
+        <Tab.Screen
+          name="OwnerRentals"
+          component={OwnerRentalsStack}
+          options={{
+            title: 'Rentals',
+            tabBarIcon: ({ color, size }) => (
+              <Ionicons name="clipboard-outline" size={size} color={color} />
+            ),
+          }}
+        />
+      ) : null}
       <Tab.Screen
         name="Explore"
         component={ExploreStack}
         options={{
+          title: 'Explore',
           tabBarIcon: ({ color, size }) => <Ionicons name="compass-outline" size={size} color={color} />,
         }}
       />
+      {isClient ? (
+        <Tab.Screen
+          name="Rent"
+          component={RentStack}
+          options={{
+            title: 'Rent',
+            tabBarIcon: ({ color, size }) => (
+              <Ionicons name="bicycle-outline" size={size} color={color} />
+            ),
+          }}
+        />
+      ) : null}
+      {isClient ? (
+        <Tab.Screen
+          name="MyRentals"
+          component={ClientRentalsStack}
+          options={{
+            title: 'My rentals',
+            tabBarIcon: ({ color, size }) => (
+              <Ionicons name="time-outline" size={size} color={color} />
+            ),
+          }}
+        />
+      ) : null}
       <Tab.Screen
         name="Profile"
         component={ProfileStack}

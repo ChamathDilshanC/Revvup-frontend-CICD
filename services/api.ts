@@ -7,12 +7,20 @@ export type ApiError = {
 
 export class ApiRequestError extends Error {
   code: string;
+  status: number;
 
-  constructor(code: string, message: string) {
+  constructor(code: string, message: string, status = 0) {
     super(message);
     this.name = 'ApiRequestError';
     this.code = code;
+    this.status = status;
   }
+}
+
+let unauthorizedHandler: (() => void) | null = null;
+
+export function setUnauthorizedHandler(handler: (() => void) | null) {
+  unauthorizedHandler = handler;
 }
 
 export async function apiRequest<T>(
@@ -43,9 +51,20 @@ export async function apiRequest<T>(
         : Array.isArray(data?.detail)
           ? String(data.detail[0]?.msg ?? data.detail[0])
           : undefined;
+
+    if (res.status === 401) {
+      unauthorizedHandler?.();
+      throw new ApiRequestError(
+        err?.code ?? 'TOKEN_EXPIRED',
+        err?.message ?? detail ?? 'Session expired. Please sign in again.',
+        401,
+      );
+    }
+
     throw new ApiRequestError(
       err?.code ?? 'REQUEST_FAILED',
       err?.message ?? detail ?? data?.message ?? 'Request failed',
+      res.status,
     );
   }
 

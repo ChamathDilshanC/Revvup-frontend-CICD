@@ -1,12 +1,12 @@
-import React, { createContext, useCallback, useContext, useMemo, useRef, useState } from 'react';
+import React, { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import {
   clearStoredProfile,
   clearTokens,
   getAccessToken,
-  getStoredProfile,
   setStoredProfile,
 } from '../lib/storage';
-import { apiRequest } from '../services/api';
+import { ApiRequestError, apiRequest, setUnauthorizedHandler } from '../services/api';
+import { isTokenExpired } from '../lib/jwt';
 import type { Profile } from '../types/user';
 
 type AuthContextValue = {
@@ -39,35 +39,44 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }, []);
 
-  const loadProfile = useCallback(async () => {
-    const token = await getAccessToken();
-    if (!token) {
-      setProfile(null);
-      return;
-    }
-    try {
-      const me = await apiRequest<Profile>('/auth/me', { token });
-      setProfile(me);
-    } catch {
-      const cached = await getStoredProfile();
-      if (cached) {
-        try {
-          setProfileState(JSON.parse(cached) as Profile);
-          return;
-        } catch {
-          /* ignore */
-        }
-      }
-      setProfile(null);
-    }
-  }, [setProfile]);
-
   const signOut = useCallback(async () => {
     await clearTokens();
     await clearStoredProfile();
     setProfileState(null);
     signOutListenerRef.current?.();
   }, []);
+
+  useEffect(() => {
+    setUnauthorizedHandler(() => {
+      void signOut();
+    });
+    return () => setUnauthorizedHandler(null);
+  }, [signOut]);
+
+  const loadProfile = useCallback(async () => {
+    const token = await getAccessToken();
+    if (!token) {
+      setProfile(null);
+      return;
+    }
+    if (isTokenExpired(token)) {
+      await signOut();
+      return;
+    }
+    try {
+      const me = await apiRequest<Profile>('/auth/me', { token });
+      setProfile(me);
+    } catch (e) {
+      if (
+        e instanceof ApiRequestError &&
+        (e.status === 401 || e.code === 'TOKEN_EXPIRED' || e.code === 'UNAUTHORIZED')
+      ) {
+        await signOut();
+        return;
+      }
+      setProfile(null);
+    }
+  }, [setProfile, signOut]);
 
   const value = useMemo<AuthContextValue>(
     () => ({

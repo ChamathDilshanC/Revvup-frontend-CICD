@@ -5,6 +5,7 @@ import {
   KeyboardAvoidingView,
   Platform,
   ScrollView,
+  Switch,
   Text,
   TextInput,
   View,
@@ -39,6 +40,11 @@ export function BikeFormScreen({ navigation, route }: Props) {
   const [engine, setEngine] = useState('');
   const [horsepower, setHorsepower] = useState('');
   const [year, setYear] = useState('');
+  const [isAvailable, setIsAvailable] = useState(true);
+  const [isRentable, setIsRentable] = useState(false);
+  const [rentPerHour, setRentPerHour] = useState('');
+  const [rentPerDay, setRentPerDay] = useState('');
+  const [securityDeposit, setSecurityDeposit] = useState('');
   const [loading, setLoading] = useState(isEdit);
   const [saving, setSaving] = useState(false);
 
@@ -59,6 +65,11 @@ export function BikeFormScreen({ navigation, route }: Props) {
         setEngine(b.engine_cc != null ? String(b.engine_cc) : '');
         setHorsepower(b.horsepower != null ? String(b.horsepower) : '');
         setYear(b.year != null ? String(b.year) : '');
+        setIsAvailable(b.is_available !== false);
+        setIsRentable(b.is_rentable === true);
+        setRentPerHour(b.rent_per_hour != null ? String(b.rent_per_hour) : '');
+        setRentPerDay(b.rent_per_day != null ? String(b.rent_per_day) : '');
+        setSecurityDeposit(b.security_deposit != null ? String(b.security_deposit) : '');
       } catch (e) {
         Alert.alert('Error', e instanceof Error ? e.message : 'Could not load bike');
         navigation.goBack();
@@ -98,6 +109,11 @@ export function BikeFormScreen({ navigation, route }: Props) {
       engine_cc: parseNum(engine),
       horsepower: parseNum(horsepower),
       year: parseNum(year),
+      is_available: isAvailable,
+      is_rentable: isRentable,
+      rent_per_hour: isRentable ? parseNum(rentPerHour) : undefined,
+      rent_per_day: isRentable ? parseNum(rentPerDay) : undefined,
+      security_deposit: isRentable ? parseNum(securityDeposit) : undefined,
     };
 
     setSaving(true);
@@ -162,11 +178,102 @@ export function BikeFormScreen({ navigation, route }: Props) {
               <Field classes={classes} colors={colors} label="Name" value={name} onChangeText={setName} />
               <Field classes={classes} colors={colors} label="Brand" value={brand} onChangeText={setBrand} />
               <Field classes={classes} colors={colors} label="Price (USD)" value={price} onChangeText={setPrice} keyboardType="decimal-pad" />
-              <Field classes={classes} colors={colors} label="Top speed (mph)" value={topSpeed} onChangeText={setTopSpeed} keyboardType="number-pad" />
-              <Field classes={classes} colors={colors} label="Weight (lbs)" value={weight} onChangeText={setWeight} keyboardType="number-pad" />
-              <Field classes={classes} colors={colors} label="Engine (cc)" value={engine} onChangeText={setEngine} keyboardType="number-pad" />
+              <Field
+                classes={classes}
+                colors={colors}
+                label="Top speed (mph)"
+                value={topSpeed}
+                onChangeText={setTopSpeed}
+                keyboardType="number-pad"
+                placeholder="e.g. 115"
+              />
+              <Field
+                classes={classes}
+                colors={colors}
+                label="Weight (lbs) — shown in Explore"
+                value={weight}
+                onChangeText={setWeight}
+                keyboardType="number-pad"
+                placeholder="e.g. 180"
+              />
+              <Field
+                classes={classes}
+                colors={colors}
+                label="Engine (cc) — shown in Explore"
+                value={engine}
+                onChangeText={setEngine}
+                keyboardType="number-pad"
+                placeholder="e.g. 150"
+              />
               <Field classes={classes} colors={colors} label="Horsepower" value={horsepower} onChangeText={setHorsepower} keyboardType="number-pad" />
               <Field classes={classes} colors={colors} label="Year" value={year} onChangeText={setYear} keyboardType="number-pad" />
+
+              <View
+                className={`${classes.card} mb-4 flex-row items-center justify-between px-4 py-3`}
+              >
+                <View className="flex-1 pr-3">
+                  <Text className={classes.textBold}>Available for clients</Text>
+                  <Text className={`${classes.bodySm} mt-1`}>
+                    Turn off when sold or not for sale — clients see &quot;Not available&quot; in Explore.
+                  </Text>
+                </View>
+                <Switch
+                  value={isAvailable}
+                  onValueChange={setIsAvailable}
+                  trackColor={{ false: '#9CA3AF', true: '#E63946' }}
+                  thumbColor="#FFFFFF"
+                />
+              </View>
+
+              <View
+                className={`${classes.card} mb-4 flex-row items-center justify-between px-4 py-3`}
+              >
+                <View className="flex-1 pr-3">
+                  <Text className={classes.textBold}>Available for rent</Text>
+                  <Text className={`${classes.bodySm} mt-1`}>
+                    Clients can book this bike from Explore. Leave rates empty to use defaults.
+                  </Text>
+                </View>
+                <Switch
+                  value={isRentable}
+                  onValueChange={setIsRentable}
+                  trackColor={{ false: '#9CA3AF', true: '#E63946' }}
+                  thumbColor="#FFFFFF"
+                />
+              </View>
+
+              {isRentable ? (
+                <>
+                  <Field
+                    classes={classes}
+                    colors={colors}
+                    label="Rent per hour (LKR)"
+                    value={rentPerHour}
+                    onChangeText={setRentPerHour}
+                    keyboardType="number-pad"
+                    placeholder="Default 1,500"
+                  />
+                  <Field
+                    classes={classes}
+                    colors={colors}
+                    label="Rent per day (LKR)"
+                    value={rentPerDay}
+                    onChangeText={setRentPerDay}
+                    keyboardType="number-pad"
+                    placeholder="Default 15,000"
+                  />
+                  <Field
+                    classes={classes}
+                    colors={colors}
+                    label="Security deposit (LKR)"
+                    value={securityDeposit}
+                    onChangeText={setSecurityDeposit}
+                    keyboardType="number-pad"
+                    placeholder="Default 5,000"
+                  />
+                </>
+              ) : null}
+
               <PrimaryButton
                 label={isEdit ? 'Save changes' : 'Add bike'}
                 onPress={handleSave}
@@ -186,6 +293,7 @@ function Field({
   onChangeText,
   keyboardType,
   autoCapitalize,
+  placeholder,
   classes,
   colors,
 }: {
@@ -194,6 +302,7 @@ function Field({
   onChangeText: (t: string) => void;
   keyboardType?: 'default' | 'decimal-pad' | 'number-pad';
   autoCapitalize?: 'none' | 'sentences';
+  placeholder?: string;
   classes: { inputLabel: string; inputMb: string };
   colors: { placeholder: string };
 }) {
@@ -207,7 +316,7 @@ function Field({
         keyboardType={keyboardType}
         autoCapitalize={autoCapitalize ?? 'sentences'}
         className={classes.inputMb}
-        placeholder={label}
+        placeholder={placeholder ?? label}
       />
     </View>
   );

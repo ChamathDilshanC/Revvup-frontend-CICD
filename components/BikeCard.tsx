@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, Text, Pressable } from 'react-native';
+import { useCurrency } from '../context/CurrencyContext';
 import { useTheme } from '../context/ThemeContext';
 import { AppImage } from './AppImage';
 
@@ -7,14 +8,15 @@ export interface BikeCardProps {
   id: string;
   name: string;
   brand: string;
-  price: number;
+  priceUsd: number;
   imageUrl: string;
   topSpeed?: number;
   onPress?: (id: string) => void;
 }
 
-export function BikeCard({ id, name, brand, price, imageUrl, topSpeed, onPress }: BikeCardProps) {
+export function BikeCard({ id, name, brand, priceUsd, imageUrl, topSpeed, onPress }: BikeCardProps) {
   const { classes, colors } = useTheme();
+  const { formatPrice } = useCurrency();
 
   return (
     <Pressable onPress={() => onPress?.(id)} className={classes.bikeCard}>
@@ -24,7 +26,7 @@ export function BikeCard({ id, name, brand, price, imageUrl, topSpeed, onPress }
         <Text className={classes.bikeName}>{name}</Text>
         <View className="mt-3 flex-row items-center justify-between">
           <Text style={{ color: colors.primary }} className="text-base font-bold">
-            ${price.toLocaleString()}
+            {formatPrice(priceUsd)}
           </Text>
           {topSpeed != null && <Text className={classes.bodySm}>{topSpeed} mph</Text>}
         </View>
